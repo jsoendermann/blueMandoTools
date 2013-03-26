@@ -1,7 +1,6 @@
 package pinyin
 
 import (
-  //"fmt"
   "strings"
   "strconv"
   "unicode"
@@ -63,16 +62,6 @@ func indexOfLastVowel(s string) int {
   return index
 }
 
-// This function retuns the rune at rune index i
-func runeByIndex(s string, i int) rune {
-  for j,v := range s {
-    if j == i {
-      return v
-    }
-  }
-  //TODO maybe throw an error?
-  panic("Rune index out of bounds")
-}
 
 
 
@@ -152,7 +141,7 @@ func addDiacritic(s string, t int) string {
 
   
   lastVowelIndex := indexOfLastVowel(s)
-  lastVowelRune := runeByIndex(s, lastVowelIndex) 
+  lastVowelRune := util.RuneByIndex(s, lastVowelIndex) 
   lastVowelDiacriticRune := diacriticRuneForRuneAndTone(lastVowelRune, t)
 
   result = util.SubstringByRuneIndex(s, 0, lastVowelIndex)
