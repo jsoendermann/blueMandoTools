@@ -6,6 +6,7 @@ import (
   "strconv"
   "unicode"
   "unicode/utf8"
+  "github.com/jsoendermann/util"
 )
 
 type word struct {
@@ -74,18 +75,6 @@ func runeByIndex(s string, i int) rune {
 }
 
 
-// This funciton returns a substring based on the rune index
-func substringByRuneIndex(s string, from int, to int) string {
-  r := ""
-
-  for i,c := range s {
-    if i >= from && i < to {
-      r += string(c)
-    }
-  }
-
-  return r
-}
 
 
 // TODO dry these two functions
@@ -166,9 +155,9 @@ func addDiacritic(s string, t int) string {
   lastVowelRune := runeByIndex(s, lastVowelIndex) 
   lastVowelDiacriticRune := diacriticRuneForRuneAndTone(lastVowelRune, t)
 
-  result = substringByRuneIndex(s, 0, lastVowelIndex)
+  result = util.SubstringByRuneIndex(s, 0, lastVowelIndex)
   result += string(lastVowelDiacriticRune)
-  result += substringByRuneIndex(s, lastVowelIndex + 1, utf8.RuneCountInString(s))
+  result += util.SubstringByRuneIndex(s, lastVowelIndex + 1, utf8.RuneCountInString(s))
 
   return result
 }
