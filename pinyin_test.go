@@ -5,7 +5,7 @@ import (
   "unicode/utf8"
 )
 
-func TestIndexOfRune(t *testing.T) {
+func TestIndexOfRuneInTonesArray(t *testing.T) {
   var tests = []struct {
     letter string
     index int
@@ -20,10 +20,10 @@ func TestIndexOfRune(t *testing.T) {
 
   for _,u := range tests {
     letterRune, _ := utf8.DecodeRuneInString(u.letter)
-    i := indexOfRune(letterRune)
+    i := indexOfRuneInTonesArray(letterRune)
 
     if i != u.index {
-      t.Errorf("indexOfRune(%q) == %q, want %q", u.letter, i, u.index)
+      t.Errorf("indexOfRuneInTonesArray(%q) == %q, want %q", u.letter, i, u.index)
     }
   }
 }
@@ -37,6 +37,7 @@ func TestDiacriticRuneForRuneAndTone(t *testing.T) {
     {"a",1,"ā"},
     {"ü",3,"ǚ"},
     {"Ü",2,"Ǘ"},
+    {"e",0,"e"},
   }
 
   for _,u := range tests {
@@ -51,40 +52,56 @@ func TestDiacriticRuneForRuneAndTone(t *testing.T) {
   }
 }
 
-//TODO write tests for indexOfLastVowel
-//func TestIndexOfLastVowel(t *testing.T) {
-//
-//
-//
-//}
-
-//TODO write tests for runeByIndex
-//TODO write tests for substringRuneIndex
-//TODO write tests for runecount
-
-func TestAddDiacritics(t *testing.T) {
+func TestIndexOfLastVowel(t *testing.T) {
   var tests = []struct {
-    syllable string
-    tone int
-    syllableWithDiacritic string
+    s string
+    i int
   }{
-    {"John", -1, "John"},
-    {"ni", 3, "nǐ"},
-    {"bu", 4, "bù"},
-    {"yao", 4, "yào"},
-    {"Bei", 3, "Běi"},
-    {"jing", 1, "jīng"},
-    {"ma", 0, "ma"},
-    {"gou", 3, "gǒu"},
-    {"shuang", 1, "shuāng"},
-    {"lve", 4, "lvè"},
+    {"bba",2},
+    {"a",0},
+    {"züzüü",6},
+    {"",-1},
+    {"bb",-1},
   }
 
   for _,u := range tests {
-    result := addDiacritic(u.syllable, u.tone)
+    result := indexOfLastVowel(u.s)
+
+    if result != u.i {
+      t.Errorf("indexOfLastVowel(%q) == %d, want %d", u.s, result, u.i)
+    }
+  }
+}
+
+
+
+
+
+//TODO write tests for runeByIndex
+
+func TestAddDiacritics(t *testing.T) {
+  var tests = []struct {
+    w word
+    syllableWithDiacritic string
+  }{
+    {word{syllable: "John",   tone: -1}, "John"},
+    {word{syllable: "ni",     tone: 3}, "nǐ"},
+    {word{syllable: "bu",     tone: 4}, "bù"},
+    {word{syllable: "yao",    tone: 4}, "yào"},
+    {word{syllable: "Bei",    tone: 3}, "Běi"},
+    {word{syllable: "jing",   tone: 1}, "jīng"},
+    {word{syllable: "ma",     tone: 0}, "ma"},
+    {word{syllable: "gou",    tone: 3}, "gǒu"},
+    {word{syllable: "shuang", tone: 1}, "shuāng"},
+    {word{syllable: "lve",    tone: 4}, "lvè"},
+    {word{syllable: "lüe",    tone: 4}, "lüè"},
+  }
+
+  for _,u := range tests {
+    result := addDiacritic(u.w)
 
     if result != u.syllableWithDiacritic {
-      t.Errorf("addDiacritic(%q, %d) == %q, want %q", u.syllable, u.tone, result, u.syllableWithDiacritic)
+      t.Errorf("addDiacritic(%q) == %q, want %q", u.w, result, u.syllableWithDiacritic)
     }
   }
 
