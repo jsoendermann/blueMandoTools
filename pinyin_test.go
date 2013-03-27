@@ -77,8 +77,6 @@ func TestIndexOfLastVowel(t *testing.T) {
 
 
 
-//TODO write tests for runeByIndex
-
 func TestAddDiacritics(t *testing.T) {
   var tests = []struct {
     w word
@@ -107,7 +105,7 @@ func TestAddDiacritics(t *testing.T) {
 
 }
 
-func TestNumbersToDiacritics(t *testing.T) {
+func TestNum2Dia(t *testing.T) {
   var tests = []struct {
     numbers, diacritics string
   }{
@@ -116,13 +114,43 @@ func TestNumbersToDiacritics(t *testing.T) {
   }
 
   for _,u := range tests {
-    result := NumbersToDiacritics(u.numbers)
+    result := Num2Dia(u.numbers)
 
     if result != u.diacritics {
-      t.Errorf("NumbersToDiacritics(%q) == %q, want %q", u.numbers, result, u.diacritics)
+      t.Errorf("Num2Dia(%q) == %q, want %q", u.numbers, result, u.diacritics)
     }
   }
 }
 
-//TODO write tests for splitNumbersString
-//TODO write tests for NumbersToDiacriticsAndHtmlColors
+func TestSplitNumbersString(t *testing.T) {
+  var tests = []struct {
+    s string
+    w []word
+  }{
+    {"ni3 hao3 ma5", []word{
+      word{"ni", 3,},
+      word{"hao", 3},
+      word{"ma", 0},
+    },
+    },
+    {"John qu4 Bei3 jing1", []word{
+      word{"John", -1},
+      word{"qu", 4},
+      word{"Bei", 3},
+      word{"jing", 1},
+    },
+    },
+  }
+  
+  for _,u := range tests {
+    result := splitNumbersString(u.s)
+
+    for i,w := range result {
+      if w.syllable != u.w[i].syllable || w.tone != u.w[i].tone {
+        t.Errorf("splitNumbersString(%q) == %+v, want %+v", u.s, result, u.w)
+      }
+    }
+  }
+}
+
+
