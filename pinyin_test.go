@@ -122,6 +122,8 @@ func TestNum2Dia(t *testing.T) {
   }
 }
 
+// TODO add tests for Num2DiaCol
+
 func TestSplitNumbersString(t *testing.T) {
   var tests = []struct {
     s string
