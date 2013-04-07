@@ -152,7 +152,7 @@ func Num2DiaCol(pinyinWithNumbers string, colors []string) string {
 
   s := ""
 
-  for _, w := range splitString {
+  for i, w := range splitString {
     t := addDiacritic(w)
     if colors != nil {
       if w.tone != -1 {
@@ -160,6 +160,9 @@ func Num2DiaCol(pinyinWithNumbers string, colors []string) string {
       }
     }
     s += t
+    if i < len(splitString)-1 {
+      s += " "
+    }
   }
   return s
 }
