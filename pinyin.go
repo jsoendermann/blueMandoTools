@@ -161,7 +161,12 @@ func Num2DiaCol(pinyinWithNumbers string, colors []string) string {
     }
     s += t
     if i < len(splitString)-1 {
-      s += " "
+      // TODO give the user the choice of which one to use
+      if colors != nil {
+        s += "&nbsp;"
+      } else {
+        s += " "
+      }
     }
   }
   return s
