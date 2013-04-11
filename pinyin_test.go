@@ -114,7 +114,7 @@ func TestNum2Dia(t *testing.T) {
   }
 
   for _,u := range tests {
-    result := Num2Dia(u.numbers)
+    result := Num2Dia(u.numbers, "")
 
     if result != u.diacritics {
       t.Errorf("Num2Dia(%q) == %q, want %q", u.numbers, result, u.diacritics)

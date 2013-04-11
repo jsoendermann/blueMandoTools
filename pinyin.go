@@ -144,7 +144,7 @@ func addHTMLColors(s, color string) string {
 
 // Num2DiaCol takes a pinyin string and a slice of html colors, converts
 // the pinyin to diacritics and adds html for the colors
-func Num2DiaCol(pinyinWithNumbers string, colors []string) string {
+func Num2DiaCol(pinyinWithNumbers string, colors []string, separator string) string {
   pinyinWithNumbers = strings.Replace(pinyinWithNumbers, "v", "ü", -1)
   pinyinWithNumbers = strings.Replace(pinyinWithNumbers, "V", "Ü", -1)
 
@@ -161,19 +161,14 @@ func Num2DiaCol(pinyinWithNumbers string, colors []string) string {
     }
     s += t
     if i < len(splitString)-1 {
-      // TODO give the user the choice of which one to use
-      if colors != nil {
-        s += "&nbsp;"
-      } else {
-        s += " "
-      }
+      s += separator
     }
   }
   return s
 }
 
-func Num2Dia(pinyinWithNumbers string) string {
-  return Num2DiaCol(pinyinWithNumbers, nil)
+func Num2Dia(pinyinWithNumbers string, separator string) string {
+  return Num2DiaCol(pinyinWithNumbers, nil, separator)
 }
 
 
