@@ -1,3 +1,8 @@
+/*
+Package pinyin implements functions to convert pinyin strings of the form 
+"ni3 hao3" to the form "nǐ hǎo" and optionally add html to colorize the words
+based on their tone.
+*/
 package pinyin
 
 import (
@@ -36,6 +41,7 @@ func indexOfRuneInTonesArray(r rune) int {
 
 // diacriticRuneForRuneAndTone combines r and t into a diacritic letter.
 // t must be between 0 and 4
+//FIXME check if input values are in allowed range/in array
 func diacriticRuneForRuneAndTone(r rune, t int) rune {
   // get column of r in tones
   i := indexOfRuneInTonesArray(r)
@@ -46,7 +52,6 @@ func diacriticRuneForRuneAndTone(r rune, t int) rune {
       return r
     }
   }
-  //FIXME return error
   return r
 }
 
@@ -143,7 +148,9 @@ func addHTMLColors(s, color string) string {
 
 
 // Num2DiaCol takes a pinyin string and a slice of html colors, converts
-// the pinyin to diacritics and adds html for the colors
+// the pinyin to diacritics and adds html for the colors. This function
+// does not preserve the original whitespace between words. Instead, the third argument
+// is the seperator that the words are joined with (usually " " or "&nbsp;"
 func Num2DiaCol(pinyinWithNumbers string, colors []string, separator string) string {
   pinyinWithNumbers = strings.Replace(pinyinWithNumbers, "v", "ü", -1)
   pinyinWithNumbers = strings.Replace(pinyinWithNumbers, "V", "Ü", -1)
@@ -167,6 +174,10 @@ func Num2DiaCol(pinyinWithNumbers string, colors []string, separator string) str
   return s
 }
 
+// Num2DiaCol takes a pinyin string and converts the pinyin to diacritics 
+// and adds html for the colors. This function does not preserve the
+// original whitespace between words. Instead, the third argument
+// is the seperator that the words are joined with (usually " " or "&nbsp;"
 func Num2Dia(pinyinWithNumbers string, separator string) string {
   return Num2DiaCol(pinyinWithNumbers, nil, separator)
 }
