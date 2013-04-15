@@ -16,3 +16,6 @@ const (
 type ToHTMLer interface {
   ToHTML(toneColors []string) string
 }
+
+// TODO Maybe add a ToCarder interface that converts records to 
+// csv rows.
