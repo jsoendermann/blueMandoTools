@@ -10,4 +10,9 @@ const (
     Simp
 )
 
-
+// Different types of dictionary records can implement this interface
+// to provide a way to convert the data they hold to html for use on
+// a card. The colors must be in the form "#FFFFFF"
+type ToHTMLer interface {
+  ToHTML(toneColors []string) string
+}
