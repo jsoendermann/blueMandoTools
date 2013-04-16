@@ -1,5 +1,7 @@
 package main
-
+/*
+TODO package description
+*/
 //package moedict
 
 import (
@@ -13,7 +15,7 @@ import (
 // These three structs reflect the json of the api at https://www.moedict.tw/uni/
 // which is documented (in Chinese) here: https://hackpad.com/3du.tw-API-Design-95jKjray8uR
 // Fields that are commented out are not used at the moment.
-type Record struct {
+type Entry struct {
 	Title string
 	//	Radical                  string
 	//	Stroke_count             int
@@ -39,7 +41,10 @@ type Definition struct {
 	Synonyms string
 }
 
-func FindRecord(word string) (*Record, error) {
+
+// FindEntry queries http://www.moedict.tw/uni/ and loads the data into a variable of type Entry
+// a pointer to which it returns. This method blocks during the http request.
+func FindEntry(word string) (*Entry, error) {
 	// make http request, check for errors and defer close
 	resp, err := http.Get("http://www.moedict.tw/uni/" + word)
 	if err != nil {
@@ -53,17 +58,17 @@ func FindRecord(word string) (*Record, error) {
 		return nil, err
 	}
 
-	// unmarshal json into r
-	var r Record
+	// unmarshal json into e
+	var e Entry
 
-	jsonErr := json.Unmarshal(body, &r)
+	jsonErr := json.Unmarshal(body, &e)
 	if jsonErr != nil {
 		return nil, jsonErr
 	}
 
-	return &r, nil
+	return &e, nil
 }
 
 func main() {
-	FindRecord("如")
+	FindEntry("asfawegwaeg")
 }
