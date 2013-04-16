@@ -18,9 +18,9 @@ vcLookupClicked = ->
     $.ajax({url: "/vocab/lookup/#{word}", async: true, dataType: 'json'}).success( (response) ->
       console.log response
       if response["error"] == 'nil'
-        textAreaAddLineAndScroll('#vc-output', response['response'])
+        textAreaAddLineAndScroll '#vc-output', response['response']
       else
-        textAreaAddLineAndScroll('#vc-not-found', response['word'])
+        textAreaAddLineAndScroll '#vc-not-found', response['word']
 
     )
 

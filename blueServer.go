@@ -45,10 +45,18 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
   word := r.URL.Path[vocabLookupPathLength:]
   fmt.Println(word)
 
-  //FIXME handle error
-  records, _ := cedict.FindRecords(word, chinese.Simp)
+  records, err := cedict.FindRecords(word, chinese.Simp)
+  if err != nil {
+    fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+    return
+  }
   if records == nil {
-    records, _ = cedict.FindRecords(word, chinese.Trad)
+    records, err = cedict.FindRecords(word, chinese.Trad)
+    if err != nil {
+      fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+      return
+   }
+
   }
 
   if len(records) == 0 {
@@ -85,7 +93,12 @@ func sentenceHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
   fmt.Println("Welcome to the Blue Mandarin Lab Card Generator Server.")
-
+  
+  err := cedict.LoadDb()
+  if err != nil {
+    panic(err)
+  }
+  defer cedict.CloseDb()
 
   vocabHtmlData, err := ioutil.ReadFile("vocab.html")
   if err != nil {
