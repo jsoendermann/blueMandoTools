@@ -3,70 +3,65 @@ package main
 //package moedict
 
 import (
-	"fmt"
+//	"fmt"
 	// "github.com/yangchuanzhang/chinese"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 )
 
-// these three structs reflect the json of the api at https://www.moedict.tw/uni/
+// These three structs reflect the json of the api at https://www.moedict.tw/uni/
 // which is documented (in Chinese) here: https://hackpad.com/3du.tw-API-Design-95jKjray8uR
+// Fields that are commented out are not used at the moment.
 type Record struct {
-	title                    string
-	radical                  string
-	stroke_count             int
-	non_radical_stroke_count int
+  Title string
+//	Radical                  string
+//	Stroke_count             int
+//	Non_radical_stroke_count int
 
-	heteronyms []heteronym
+	Heteronyms []Heteronym
 }
 
-type heteronym struct {
-	pinyin    string
-	bopomofo  string
-	bopomofo2 string
+type Heteronym struct {
+	Pinyin    string
+	Bopomofo  string
+//	Bopomofo2 string
 
-	definitions []definition
+	Definitions []Definition
 }
 
-type definition struct {
-	def      string
-	quote    []string
-	example  []string
-	defType  string // this field is called "type" in the output of the server
-	link     string
-	synonyms string
+type Definition struct {
+	Def      string
+	Quote    []string
+	Example  []string
+//	DefType  string `json:"type"` // this field is called "type" in the output of the server
+//	Link     string
+	Synonyms string
 }
 
 func FindRecord(word string) (*Record, error) {
+  // make http request, check for errors and defer close
 	resp, err := http.Get("http://www.moedict.tw/uni/" + word)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+  // read data into variable
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	var data interface{}
-	jsonErr := json.Unmarshal(body, &data)
-	if jsonErr != nil {
+  // unmarshal json into r
+  var r Record
+
+  jsonErr := json.Unmarshal(body, &r)
+  if jsonErr != nil {
 		return nil, jsonErr
 	}
 
-	r := new(Record)
-
-	dataDict := data.(map[string]interface{})
-
-	r.title = dataDict["title"].(string)
-	r.stroke_count = dataDict["stroke_count"].(int)
-	// r.radical = data["radical"].(string)
-	// r.non_radical_stroke_count = data["non_radical_stroke_count"].(int)
-
-	fmt.Println(r)
-	return nil, nil
+  return &r, nil
 }
 
 func main() {
