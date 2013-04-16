@@ -5,7 +5,7 @@ TODO package description
 //package moedict
 
 import (
-	//	"fmt"
+	"fmt"
 	// "github.com/yangchuanzhang/chinese"
 	"encoding/json"
 	"io/ioutil"
@@ -66,9 +66,15 @@ func FindEntry(word string) (*Entry, error) {
 		return nil, jsonErr
 	}
 
+  fmt.Println(e.Title)
+  if e.Title == "" { // Word could not be found in dict
+    return nil, fmt.Errorf("Word doesn't exist in dictionary")
+  }
+
 	return &e, nil
 }
 
 func main() {
-	FindEntry("asfawegwaeg")
+  a,e := FindEntry("asfawegwaeg")
+  fmt.Println(a,e)
 }
