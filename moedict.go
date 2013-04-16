@@ -1,8 +1,7 @@
-package main
 /*
 TODO package description
 */
-//package moedict
+package moedict
 
 import (
 	"fmt"
@@ -72,9 +71,4 @@ func FindEntry(word string) (*Entry, error) {
   }
 
 	return &e, nil
-}
-
-func main() {
-  a,e := FindEntry("asfawegwaeg")
-  fmt.Println(a,e)
 }
