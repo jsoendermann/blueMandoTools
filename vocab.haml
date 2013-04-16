@@ -2,11 +2,12 @@
 %html
   %head
     %title The Blue Mandarin Lab - Card Generator
+
     %link{rel: "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
 
     %script{src: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
-    %script{:type => "text/javascript", :src => "/assets/bootstrap.js"}
-    %script{:type => "text/javascript", :src => "/assets/vocab.js"}
+    %script{src: "/assets/bootstrap.js"}
+    %script{src: "/assets/vocab.js"}
 
   %body(style="padding-top: 60px;")
     .navbar.navbar-inverse.navbar-fixed-top
@@ -17,6 +18,8 @@
               %a{href: "#"} Vocab Cards
             %li
               %a{href: "#"} Sentence Cards
+
+
     .container
       .span8.offset2
         %h1 Vocab Cards
@@ -48,24 +51,6 @@
           Forth: 
           %input(type="color" name="vc-tone-0" style="width: 30px;")
           &nbsp;
-
-
-          -#%ul
-            %li 
-              %input(type="color" name="vc-tone-0" style="width: 30px;")
-              Neutral Tone
-            %li 
-              %input(type="color" name="vc-tone-1" style="width: 30px;")
-              Neutral Tone
-            %li 
-              %input(type="color" name="vc-tone-2" style="width: 30px;")
-              Second Tone
-            %li 
-              %input(type="color" name="vc-tone-3" style="width: 30px;")
-              Third Tone
-            %li 
-              %input(type="color" name="vc-tone-4" style="width: 30px;")
-              Forth Tone
 
           <br><br>
 
