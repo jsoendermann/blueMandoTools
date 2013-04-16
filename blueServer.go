@@ -1,125 +1,146 @@
-/*
-TODO add package description
-*/
 package main
 
 import (
-  "fmt"
-  "io/ioutil"
-  "net/http"
-//  "os"
-//  "html/template"
-  "github.com/yangchuanzhang/cedict"
-  "github.com/yangchuanzhang/pinyin"
-  "github.com/yangchuanzhang/chinese"
+	"fmt"
+	"github.com/yangchuanzhang/cedict"
+	"github.com/yangchuanzhang/chinese"
+	"github.com/yangchuanzhang/pinyin"
+	"io/ioutil"
+	"net/http"
 )
 
+// Paths on the server
 const (
-  vocabPath = "/vocab/"
-  sentencesPath = "/sentences/"
+	vocabPath     = "/vocab/"
+	sentencesPath = "/sentences/"
 
-  vocabLookupPath = "/vocab/lookup/"
-  sentencesLookupPath = "/sentences/lookup/"
+	vocabLookupPath     = "/vocab/lookup/"
+	sentencesLookupPath = "/sentences/lookup/"
 
-  assetsPath = "/assets/"
+	assetsPath = "/assets/"
 )
 
+// The length of the lookup paths, used to separate
+// the words from the url
 const (
-  vocabLookupPathLength = len(vocabLookupPath)
-  sentencesLookupPathLength = len(sentencesLookupPath)
+	vocabLookupPathLength     = len(vocabLookupPath)
+	sentencesLookupPathLength = len(sentencesLookupPath)
 )
 
-
+// The HTML for the two pages is loaded into these variables
+// to avoid having to load them on each request
 var vocabHtml, sentencesHtml string
 
-
+// The indexHandler redirects the user to the sentences page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-  http.Redirect(w, r, sentencesPath, http.StatusFound)
+	http.Redirect(w, r, sentencesPath, http.StatusFound)
 }
 
+// The vocabHandler is a static page that gets written to the
+// ResponseWriter
 func vocabHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, vocabHtml)
+	fmt.Fprintf(w, vocabHtml)
 }
 
 func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
-  word := r.URL.Path[vocabLookupPathLength:]
-  fmt.Println(word)
+	// get the word from the path
+	word := r.URL.Path[vocabLookupPathLength:]
 
-  records, err := cedict.FindRecords(word, chinese.Simp)
-  if err != nil {
-    fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
-    return
-  }
-  if records == nil {
-    records, err = cedict.FindRecords(word, chinese.Trad)
-    if err != nil {
-      fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
-      return
-   }
+	// search the db for records (simp first, if unsuccessful, try trad)
+	// and send errors back to client if any arise
+	records, err := cedict.FindRecords(word, chinese.Simp)
+	if err != nil {
+		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		return
+	}
+	if records == nil {
+		records, err = cedict.FindRecords(word, chinese.Trad)
+		if err != nil {
+			fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+			return
+		}
 
-  }
+	}
 
-  if len(records) == 0 {
-    fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
-    return
-  }
+	// check if there were no matches in the db
+	if len(records) == 0 {
+		fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
+		return
+	}
 
-  var output string
+	// construct csv row
+	var output string
 
-  //FIXME explain \\t how it's not valid json
-  output += records[0].Simp
-  output += "\\t"
-  output += records[0].Trad
-  output += "\\t"
+	// \\t is used instead of \t because \t is not valid json and
+	// the client substitues \t for \\t automatically
+	output += records[0].Simp
+	output += "\\t"
+	output += records[0].Trad
+	output += "\\t"
 
-  for _,record := range records {
-    //FIXME add colors
-    output += pinyin.Num2Dia(record.Pinyin, "&nbsp;")
-    //FIXME explain this
-    output += "&nbsp;&nbsp;&nbsp; "
-    //FIXME mask "s
-    output += record.English
-    output += "<br />"
-  }
+	for _, record := range records {
+		//FIXME add colors
+		output += pinyin.Num2Dia(record.Pinyin, "&nbsp;")
+		// \t can't be used for this because it separates the columns
+		// in the csv. Add another real space character at the end
+		// to make the line break between pinyin and definition on small devices
+		output += "&nbsp;&nbsp;&nbsp; "
+		//FIXME mask "s
+		output += record.English
+		output += "<br />"
+	}
 
-
-
-  fmt.Fprintf(w, `{"error":"nil", "response":"`+output+`"}`)
+	// FIXME change "response" to something more meaningful
+	fmt.Fprintf(w, `{"error":"nil", "response":"`+output+`"}`)
 }
 
+// The sentenceHandler is a static page that gets written to the
+// ResponseWriter
 func sentenceHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	fmt.Fprintf(w, sentencesHtml)
+}
+
+func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
+	//TODO implement this method
 }
 
 func main() {
-  fmt.Println("Welcome to the Blue Mandarin Lab Card Generator Server.")
-  
-  err := cedict.LoadDb()
-  if err != nil {
-    panic(err)
-  }
-  defer cedict.CloseDb()
+	fmt.Println("Welcome to the Blue Mandarin Lab Card Generator Server.")
 
-  vocabHtmlData, err := ioutil.ReadFile("vocab.html")
-  if err != nil {
-    panic("vocab.html could not be opened")
-  }
-  vocabHtml = string(vocabHtmlData)
+	// Load Db, panic on error and defer close
+	err := cedict.LoadDb()
+	if err != nil {
+		panic(err)
+	}
+	defer cedict.CloseDb()
 
-//  sentencesHtmlData, err := ioutil.ReadFile("sentences.html")
-//  if err != nil {
-//    panic("sentences.html could not be opened")
-//  }
-//  sentencesHtml = string(sentencesHtmlData)
+	// Load the html for the two pages into memory, panic on error
+	vocabHtmlData, err := ioutil.ReadFile("vocab.html")
+	if err != nil {
+		panic("vocab.html could not be opened")
+	}
+	vocabHtml = string(vocabHtmlData)
 
+	sentencesHtmlData, err := ioutil.ReadFile("sentences.html")
+	if err != nil {
+		panic("sentences.html could not be opened")
+	}
+	sentencesHtml = string(sentencesHtmlData)
 
-    http.HandleFunc("/", indexHandler)
-    http.HandleFunc(vocabPath, vocabHandler)
-    http.HandleFunc(sentencesPath, sentenceHandler)
+	// root
+	http.HandleFunc("/", indexHandler)
 
-    http.HandleFunc(vocabLookupPath, vocabLookupHandler)
+	// static pages
+	http.HandleFunc(vocabPath, vocabHandler)
+	http.HandleFunc(sentencesPath, sentenceHandler)
 
-    http.Handle(assetsPath, http.FileServer(http.Dir(".")))
+	// json api
+	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
+	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 
-    http.ListenAndServe(":8080", nil)
+	// assets file server
+	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
+
+	// start server
+	http.ListenAndServe(":8080", nil)
 }
