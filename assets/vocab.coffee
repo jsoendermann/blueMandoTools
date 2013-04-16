@@ -17,14 +17,16 @@ vcLookupClicked = ->
     console.log word
     $.ajax({url: "/vocab/lookup/#{word}", async: true, dataType: 'json'}).success( (response) ->
       console.log response
-      vcOutputAddLine response["response"]
+      if response["error"] == 'nil'
+        textAreaAddLineAndScroll('#vc-output', response['response'])
+      else
+        textAreaAddLineAndScroll('#vc-not-found', response['word'])
+
     )
 
-vcOutputAddLine = (line) ->
-  console.log 'vcOutputAddLine'
-  console.log line
+textAreaAddLineAndScroll = (textAreaId, line) ->
+  ta = $(textAreaId)
 
-  $('#vc-output').val($('#vc-output').val() + line + "\n")
+  ta.val(ta.val() + line + '\n')
+  ta.scrollTop(ta[0].scrollHeight - ta.height())
 
-  mcdsOutputTa = $("#vc-output")
-  mcdsOutputTa.scrollTop(mcdsOutputTa[0].scrollHeight - mcdsOutputTa.height())

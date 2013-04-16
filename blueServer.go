@@ -52,7 +52,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   if len(records) == 0 {
-    fmt.Fprintf(w, `{"error": "No matches found"}`)
+    fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
     return
   }
 
