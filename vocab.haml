@@ -5,7 +5,7 @@
     %link{rel: "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
     %script{:type => "text/javascript", :src => "/assets/bootstrap.js"}
 
-  %body
+  %body(style="padding-top: 60px;")
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
         .container
@@ -15,7 +15,45 @@
             %li
               %a{href: "#"} Sentence Cards
     .container
-      
-    %h1 Vocab Cards
-    %p
-      hallo
+      .span8.offset2
+        %h1 Vocab Cards
+        %form.well
+          %h3 Word List
+          %textarea.span7#vc-words(rows="8" placeholder="Add words here, separated by newlines.")
+
+          <br>
+
+          %h3 
+            Tone Colours
+          %label 
+            :escaped
+              For this to work, your browser needs to implement the <input type="color"> tag. I've only tested this on Chrome.
+          <br>
+
+          %ul
+            %li 
+              %input(type="color" name="vc-tone-0" style="width: 30px;")
+              Neutral Tone
+            %li 
+              %input(type="color" name="vc-tone-1" style="width: 30px;")
+              Neutral Tone
+            %li 
+              %input(type="color" name="vc-tone-2" style="width: 30px;")
+              Second Tone
+            %li 
+              %input(type="color" name="vc-tone-3" style="width: 30px;")
+              Third Tone
+            %li 
+              %input(type="color" name="vc-tone-4" style="width: 30px;")
+              Forth Tone
+
+          <br>
+
+          %a.btn.btn-primary#vc-lookup Look up words
+
+          <br><br>
+
+          %textarea.span7#vc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
+
+        
+
