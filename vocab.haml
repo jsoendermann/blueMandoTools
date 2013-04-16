@@ -3,7 +3,10 @@
   %head
     %title The Blue Mandarin Lab - Card Generator
     %link{rel: "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
+
+    %script{src: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
     %script{:type => "text/javascript", :src => "/assets/bootstrap.js"}
+    %script{:type => "text/javascript", :src => "/assets/vocab.js"}
 
   %body(style="padding-top: 60px;")
     .navbar.navbar-inverse.navbar-fixed-top
@@ -28,9 +31,26 @@
           %label 
             :escaped
               For this to work, your browser needs to implement the <input type="color"> tag. I've only tested this on Chrome.
-          <br>
+          
 
-          %ul
+          Neutral: 
+          %input(type="color" name="vc-tone-0" style="width: 30px;")
+          &nbsp;
+          First: 
+          %input(type="color" name="vc-tone-0" style="width: 30px;")
+          &nbsp;
+          Second: 
+          %input(type="color" name="vc-tone-0" style="width: 30px;")
+          &nbsp;
+          Third: 
+          %input(type="color" name="vc-tone-0" style="width: 30px;")
+          &nbsp;
+          Forth: 
+          %input(type="color" name="vc-tone-0" style="width: 30px;")
+          &nbsp;
+
+
+          -#%ul
             %li 
               %input(type="color" name="vc-tone-0" style="width: 30px;")
               Neutral Tone
@@ -47,13 +67,16 @@
               %input(type="color" name="vc-tone-4" style="width: 30px;")
               Forth Tone
 
-          <br>
+          <br><br>
 
           %a.btn.btn-primary#vc-lookup Look up words
 
           <br><br>
 
           %textarea.span7#vc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
+
+          %textarea.span7#vc-not-found(rows="8" placeholder="The words that are not in the dictionary will appear here.")
+
 
         
 
