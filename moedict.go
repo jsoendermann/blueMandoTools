@@ -38,6 +38,7 @@ type Definition struct {
 	//	DefType  string `json:"type"` // this field is called "type" in the output of the server
 	//	Link     string
 	Synonyms string
+  Antonyms string
 }
 
 
@@ -73,17 +74,17 @@ func FindEntry(word string) (*Entry, error) {
 }
 
 // Implement chinese.ToHTMLer
-func (e *Entry) ToHTHMLer(toneColors []string) string {
-  for _, heteronym := range e.Heteronyms {
-    var html string
+func (e Entry) ToHTML(toneColors []string) string {
+  var html string
 
+  for _, heteronym := range e.Heteronyms {
     // title nice and large
     html += `<span style="font-family: Arial; font-size: 32px; color: #000000; white-space: pre-wrap;">`+e.Title+`</span>`
 
     html += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 
     // bopomofo
-    html += heteronym.bopomofo
+    html += heteronym.Bopomofo
   }
 
   return html
