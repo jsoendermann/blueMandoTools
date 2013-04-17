@@ -18,3 +18,9 @@
 
   ta.val(ta.val() + line + '\n')
   ta.scrollTop(ta[0].scrollHeight - ta.height())
+
+@getColors = ->
+  tones = {}
+  for n in [0..4]
+    tones['tone'+n] = $('input[name="vsc-tone-'+n+'"]').val()
+  return tones
