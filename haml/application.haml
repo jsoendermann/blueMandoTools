@@ -15,11 +15,13 @@
         .container
           .span8.offset2
             %ul.nav
-              %li.active
+              -# FIXME implement setting the class based on the path
+              -#%li.active
+              %li#vocab-link
                 -# TODO Find a better solution for this css hack
-                %a(href="#" style="padding-left: 0;") Vocab Cards
-              %li
-                %a{href: "#"} Sentence Cards
+                %a(href="/vocab/" style="padding-left: 0;") Vocab Cards
+              %li#sentences-link
+                %a{href: "/sentences/"} Sentence Cards
 
 
     .container
