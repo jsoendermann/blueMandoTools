@@ -5,7 +5,7 @@ package moedict
 
 import (
   "fmt"
-  // "github.com/yangchuanzhang/chinese"
+  "github.com/yangchuanzhang/bopomofo"
   "encoding/json"
   "io/ioutil"
   "net/http"
@@ -84,7 +84,7 @@ func (e Entry) ToHTML(toneColors []string) string {
     html += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 
     // bopomofo
-    html += heteronym.Bopomofo
+    html += bopomofo.Bop2Col(heteronym.Bopomofo, toneColors, "&nbsp;")
 
     html += "<br>"
 
