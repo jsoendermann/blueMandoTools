@@ -37,3 +37,4 @@ textAreaAddLineAndScroll = (textAreaId, line) ->
   ta.val(ta.val() + line + '\n')
   ta.scrollTop(ta[0].scrollHeight - ta.height())
 
+# TODO make text areas automatically select everything on focus
