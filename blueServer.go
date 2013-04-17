@@ -7,6 +7,7 @@ import (
 	"github.com/yangchuanzhang/pinyin"
 	"io/ioutil"
 	"net/http"
+  "encoding/json"
 )
 
 // Paths on the server
@@ -46,6 +47,12 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// get the word from the path
 	word := r.URL.Path[vocabLookupPathLength:]
 
+  // get colors
+  colors := make([]string, 5)
+  for i := 0; i <= 4; i ++ {
+    colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
+  }
+
 	// search the db for records (simp first, if unsuccessful, try trad)
 	// and send errors back to client if any arise
 	records, err := cedict.FindRecords(word, chinese.Simp)
@@ -71,27 +78,30 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// construct csv row
 	var output string
 
-	// \\t is used instead of \t because \t is not valid json and
-	// the client substitues \t for \\t automatically
 	output += records[0].Simp
-	output += "\\t"
+	output += "\t"
 	output += records[0].Trad
-	output += "\\t"
+	output += "\t"
 
 	for _, record := range records {
-		//FIXME add colors
-		output += pinyin.Num2Dia(record.Pinyin, "&nbsp;")
+		output += pinyin.Num2DiaCol(record.Pinyin, colors, "&nbsp;")
 		// \t can't be used for this because it separates the columns
 		// in the csv. Add another real space character at the end
 		// to make the line break between pinyin and definition on small devices
 		output += "&nbsp;&nbsp;&nbsp; "
-		//FIXME mask "s
 		output += record.English
 		output += "<br />"
 	}
 
+  // FIXME handle this error
+  // FIXME explain this
+  j, _ := json.Marshal(map[string]interface{}{
+    "error": "nil",
+    "response": output,
+  })
+
 	// FIXME change "response" to something more meaningful
-	fmt.Fprintf(w, `{"error":"nil", "response":"`+output+`"}`)
+	fmt.Fprintf(w, string(j))
 }
 
 // The sentenceHandler is a static page that gets written to the
