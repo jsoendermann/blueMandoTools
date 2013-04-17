@@ -23,7 +23,7 @@ vcLookupClicked = ->
     $.ajax({url: "/vocab/lookup/#{word}", async: true, dataType: 'json',data: {tone0: tone0, tone1: tone1, tone2: tone2, tone3: tone3, tone4: tone4}}).success( (response) ->
       # if there was no error, add the response to #vc-output...
       if response["error"] == 'nil'
-        textAreaAddLineAndScroll '#vc-output', response['response']
+        textAreaAddLineAndScroll '#vc-output', response['csv']
       # ...otherwise add the word to #vc-not-found
       else
         textAreaAddLineAndScroll '#vc-not-found', response['word']

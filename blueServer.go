@@ -98,7 +98,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
   // in the response
   j, err := json.Marshal(map[string]interface{}{
     "error": "nil",
-    "response": output,
+    "csv": output,
   })
   if err != nil {
     fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
