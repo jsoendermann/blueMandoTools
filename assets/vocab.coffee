@@ -4,7 +4,23 @@ $( ->
   $('#vc-lookup').on('click', ->
     vcLookupClicked()
   )
+
+  # Select all on focus
+  selectAllOnFocus('#vc-output')
+  selectAllOnFocus('#vc-not-found')
 )
+
+selectAllOnFocus = (ta) ->
+  $(ta).focus( ->
+    $this = $(this)
+    $this.select()
+
+    $this.mouseup( ->
+      $this.unbind("mouseup")
+      return false
+    )
+  )
+
 
 # Lookup button event handler
 vcLookupClicked = ->
