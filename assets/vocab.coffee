@@ -10,17 +10,6 @@ $( ->
   selectAllOnFocus('#vc-not-found')
 )
 
-selectAllOnFocus = (ta) ->
-  $(ta).focus( ->
-    $this = $(this)
-    $this.select()
-
-    $this.mouseup( ->
-      $this.unbind("mouseup")
-      return false
-    )
-  )
-
 
 # Lookup button event handler
 vcLookupClicked = ->
@@ -46,11 +35,3 @@ vcLookupClicked = ->
 
     )
 
-# this function adds a line of text to a text area and scrolls down so it's visible
-textAreaAddLineAndScroll = (textAreaId, line) ->
-  ta = $(textAreaId)
-
-  ta.val(ta.val() + line + '\n')
-  ta.scrollTop(ta[0].scrollHeight - ta.height())
-
-# TODO make text areas automatically select everything on focus

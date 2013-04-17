@@ -1,1 +1,41 @@
 %h1 Sentence Cards
+%form.well
+  %h3 Sentence List
+  %textarea.span7#sc-sentences(rows="8" placeholder="Add sentences here, separated by newlines, with the words that you want to look up in brackets. Example: [你好]我是[德國]人。")
+
+  <br>
+
+  %h3 
+    Tone Colours
+  %label 
+    :escaped
+      For this to work, your browser needs to implement the <input type="color"> tag. I've only tested this on Chrome.
+  
+
+  Neutral: 
+  %input(type="color" name="sc-tone-0" style="width: 30px;" value="#000000")
+  &nbsp;
+  First: 
+  %input(type="color" name="sc-tone-1" style="width: 30px;" value="#00ac00")
+  &nbsp;
+  Second: 
+  %input(type="color" name="sc-tone-2" style="width: 30px;" value="#021bff")
+  &nbsp;
+  Third: 
+  %input(type="color" name="sc-tone-3" style="width: 30px;" value="#996633")
+  &nbsp;
+  Forth: 
+  %input(type="color" name="sc-tone-4" style="width: 30px;" value="#ff0000")
+  &nbsp;
+
+  <br><br>
+
+  %a.btn.btn-primary#sc-lookup Look up sentences
+
+  <br><br>
+
+  %textarea.span7#sc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you click on \"Look up Words\".")
+
+
+
+
