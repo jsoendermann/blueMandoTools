@@ -3,7 +3,4 @@
 
 .DS_Store
 
-*.html
-
-assets/vocab.js
-assets/sentences.js
+build/*
