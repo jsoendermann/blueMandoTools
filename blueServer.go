@@ -9,7 +9,11 @@ import (
 	"net/http"
   "encoding/json"
   "strings"
+  "regexp"
+  "github.com/yangchuanzhang/moedict"
 )
+
+//TODO add printlns
 
 // Paths on the server
 const (
@@ -32,6 +36,13 @@ const (
 // The HTML for the two pages is loaded into these variables
 // to avoid having to load them on each request
 var vocabHtml, sentencesHtml string
+
+// This regexp is used to find words in sentences
+var sentencesRegexp *regexp.Regexp
+
+
+
+
 
 // The indexHandler redirects the user to the sentences page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -116,7 +127,81 @@ func sentenceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
-	//TODO implement this method
+  // get the sentence from the path
+	sentence := r.URL.Path[sentencesLookupPathLength:]
+
+  fmt.Println("Received lookup request for ", sentence)
+
+  // get colors
+  colors := make([]string, 5)
+  for i := 0; i <= 4; i ++ {
+    colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
+  }
+
+  // get words in sentence
+  wordsRaw := sentencesRegexp.FindAllStringSubmatch(sentence, -1)
+  words := make([]string, len(wordsRaw))
+  for i,w := range wordsRaw {
+    words[i] = w[1]
+  }
+
+  fmt.Println(" Word list: ", words)
+
+  // determine char set
+  charSet := cedict.DetermineCharSet(sentence)
+
+  // get moe entries
+  // this array might end up being larger than len(words) if
+  // one simplified word maps to more than one traditional word
+  moeEntries := make([]moedict.Entry, len(words))
+
+  // TODO explain diff. between trad and simp
+  if charSet == chinese.Trad {
+    for i,word := range words {
+      // find entry, return on error
+      entry, err := moedict.FindEntry(word)
+      if err != nil {
+        fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		    return
+      }
+
+      moeEntries[i] = *entry
+    }
+  }
+  if charSet == chinese.Simp {
+    // TODO implement this
+  }
+
+  // construct csv row
+	var output string
+
+  // remove brackets from string
+  var outputSentence string
+  outputSentence = strings.Replace(sentence, "[", "", -1)
+  outputSentence = strings.Replace(outputSentence, "]", "", -1)
+
+	output += outputSentence
+	output += "\t"
+
+	for _, moeEntry := range moeEntries {
+		output += moeEntry.ToHTML(colors)
+    output += "<br><br>"
+  }
+
+  // TODO turn this into a function
+
+  // use json.Marshal with an anonymous variable to escape the \t and " characters
+  // in the response
+  j, err := json.Marshal(map[string]interface{}{
+    "error": "nil",
+    "csv": output,
+  })
+  if err != nil {
+    fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+sentence+`"}`)
+    return
+  }
+
+	fmt.Fprintf(w, string(j))
 }
 
 func main() {
@@ -142,6 +227,12 @@ func main() {
   // FIXME move this into compile stage
   vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
   sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+
+  // compile regexp
+  sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
+  if err != nil {
+    panic(err)
+  }
 
 
 	// root
