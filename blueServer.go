@@ -131,12 +131,17 @@ func main() {
 
 	// Load the html for the two pages into memory, panic on error
   applicationHtml := loadFilePanicOnError("application.html")
-
   vocabHtmlView := loadFilePanicOnError("vocab.html")
   sentencesHtmlView := loadFilePanicOnError("sentences.html")
 
+  // combine the layout and the two views into complete html
   vocabHtml = strings.Replace(applicationHtml, "@yield@", vocabHtmlView, 1)
   sentencesHtml = strings.Replace(applicationHtml, "@yield@", sentencesHtmlView, 1)
+
+  // set active class in navbar
+  // FIXME move this into compile stage
+  vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
+  sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
 
 
 	// root
