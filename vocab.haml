@@ -13,11 +13,13 @@
     .navbar.navbar-inverse.navbar-fixed-top
       .navbar-inner
         .container
-          %ul.nav
-            %li.active
-              %a{href: "#"} Vocab Cards
-            %li
-              %a{href: "#"} Sentence Cards
+          .span8.offset2
+            %ul.nav
+              %li.active
+                -# TODO Find a better solution for this css hack
+                %a(href="#" style="padding-left: 0;") Vocab Cards
+              %li
+                %a{href: "#"} Sentence Cards
 
 
     .container
