@@ -1,69 +1,43 @@
-!!! 5
-%html
-  %head
-    %title The Blue Mandarin Lab - Card Generator
+%h1 Vocab Cards
+%form.well
+  %h3 Word List
+  %textarea.span7#vc-words(rows="8" placeholder="Add words here, separated by newlines.")
 
-    %link{rel: "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
+  <br>
 
-    %script{src: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
-    %script{src: "/assets/bootstrap.js"}
-    %script{src: "/assets/vocab.js"}
+  %h3 
+    Tone Colours
+  %label 
+    :escaped
+      For this to work, your browser needs to implement the <input type="color"> tag. I've only tested this on Chrome.
+  
 
-  %body(style="padding-top: 60px;")
-    .navbar.navbar-inverse.navbar-fixed-top
-      .navbar-inner
-        .container
-          .span8.offset2
-            %ul.nav
-              %li.active
-                -# TODO Find a better solution for this css hack
-                %a(href="#" style="padding-left: 0;") Vocab Cards
-              %li
-                %a{href: "#"} Sentence Cards
+  Neutral: 
+  %input(type="color" name="vc-tone-0" style="width: 30px;" value="#000000")
+  &nbsp;
+  First: 
+  %input(type="color" name="vc-tone-1" style="width: 30px;" value="#00ac00")
+  &nbsp;
+  Second: 
+  %input(type="color" name="vc-tone-2" style="width: 30px;" value="#021bff")
+  &nbsp;
+  Third: 
+  %input(type="color" name="vc-tone-3" style="width: 30px;" value="#996633")
+  &nbsp;
+  Forth: 
+  %input(type="color" name="vc-tone-4" style="width: 30px;" value="#ff0000")
+  &nbsp;
 
+  <br><br>
 
-    .container
-      .span8.offset2
-        %h1 Vocab Cards
-        %form.well
-          %h3 Word List
-          %textarea.span7#vc-words(rows="8" placeholder="Add words here, separated by newlines.")
+  %a.btn.btn-primary#vc-lookup Look up words
 
-          <br>
+  <br><br>
 
-          %h3 
-            Tone Colours
-          %label 
-            :escaped
-              For this to work, your browser needs to implement the <input type="color"> tag. I've only tested this on Chrome.
-          
+  %textarea.span7#vc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
 
-          Neutral: 
-          %input(type="color" name="vc-tone-0" style="width: 30px;" value="#000000")
-          &nbsp;
-          First: 
-          %input(type="color" name="vc-tone-1" style="width: 30px;" value="#00ac00")
-          &nbsp;
-          Second: 
-          %input(type="color" name="vc-tone-2" style="width: 30px;" value="#021bff")
-          &nbsp;
-          Third: 
-          %input(type="color" name="vc-tone-3" style="width: 30px;" value="#996633")
-          &nbsp;
-          Forth: 
-          %input(type="color" name="vc-tone-4" style="width: 30px;" value="#ff0000")
-          &nbsp;
-
-          <br><br>
-
-          %a.btn.btn-primary#vc-lookup Look up words
-
-          <br><br>
-
-          %textarea.span7#vc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
-
-          %textarea.span7#vc-not-found(rows="8" placeholder="The words that are not in the dictionary will appear here.")
+  %textarea.span7#vc-not-found(rows="8" placeholder="The words that are not in the dictionary will appear here.")
 
 
-        
+
 

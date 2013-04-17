@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
   "encoding/json"
+  "strings"
 )
 
 // Paths on the server
@@ -129,17 +130,14 @@ func main() {
 	defer cedict.CloseDb()
 
 	// Load the html for the two pages into memory, panic on error
-	vocabHtmlData, err := ioutil.ReadFile("vocab.html")
-	if err != nil {
-		panic("vocab.html could not be opened")
-	}
-	vocabHtml = string(vocabHtmlData)
+  applicationHtml := loadFilePanicOnError("application.html")
 
-	sentencesHtmlData, err := ioutil.ReadFile("sentences.html")
-	if err != nil {
-		panic("sentences.html could not be opened")
-	}
-	sentencesHtml = string(sentencesHtmlData)
+  vocabHtmlView := loadFilePanicOnError("vocab.html")
+  sentencesHtmlView := loadFilePanicOnError("sentences.html")
+
+  vocabHtml = strings.Replace(applicationHtml, "@yield@", vocabHtmlView, 1)
+  sentencesHtml = strings.Replace(applicationHtml, "@yield@", sentencesHtmlView, 1)
+
 
 	// root
 	http.HandleFunc("/", indexHandler)
@@ -157,4 +155,12 @@ func main() {
 
 	// start server
 	http.ListenAndServe(":8080", nil)
+}
+
+func loadFilePanicOnError(filename string) string {
+  data, err := ioutil.ReadFile(filename)
+  if err != nil {
+    panic(err)
+  }
+  return string(data)
 }

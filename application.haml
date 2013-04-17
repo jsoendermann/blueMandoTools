@@ -1,0 +1,27 @@
+!!! 5
+%html
+  %head
+    %title The Blue Mandarin Lab - Card Generator
+
+    %link{rel: "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
+
+    %script{src: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
+    %script{src: "/assets/bootstrap.js"}
+    %script{src: "/assets/vocab.js"}
+
+  %body(style="padding-top: 60px;")
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          .span8.offset2
+            %ul.nav
+              %li.active
+                -# TODO Find a better solution for this css hack
+                %a(href="#" style="padding-left: 0;") Vocab Cards
+              %li
+                %a{href: "#"} Sentence Cards
+
+
+    .container
+      .span8.offset2
+        @yield@ 
