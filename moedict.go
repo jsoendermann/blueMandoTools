@@ -71,3 +71,20 @@ func FindEntry(word string) (*Entry, error) {
 
 	return &e, nil
 }
+
+// Implement chinese.ToHTMLer
+func (e *Entry) ToHTHMLer(toneColors []string) string {
+  for _, heteronym := range e.Heteronyms {
+    var html string
+
+    // title nice and large
+    html += `<span style="font-family: Arial; font-size: 32px; color: #000000; white-space: pre-wrap;">`+e.Title+`</span>`
+
+    html += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+
+    // bopomofo
+    html += heteronym.bopomofo
+  }
+
+  return html
+}
