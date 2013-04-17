@@ -29,6 +29,7 @@ scLookupClicked = ->
       # TODO deal with error
       if response["error"] == 'nil'
         textAreaAddLineAndScroll '#sc-output', response['csv']
+        $('#debug').html(response['csv'])
       else
         console.log response["error"]
     )
