@@ -65,7 +65,6 @@ func FindEntry(word string) (*Entry, error) {
 		return nil, jsonErr
 	}
 
-  fmt.Println(e.Title)
   if e.Title == "" { // Word could not be found in dict
     return nil, fmt.Errorf("Word doesn't exist in dictionary")
   }
