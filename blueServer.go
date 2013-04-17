@@ -43,6 +43,7 @@ func vocabHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, vocabHtml)
 }
 
+// FIXME always use json.Marshal instead of manually constructing json
 func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// get the word from the path
 	word := r.URL.Path[vocabLookupPathLength:]
@@ -93,14 +94,17 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 		output += "<br />"
 	}
 
-  // FIXME handle this error
-  // FIXME explain this
-  j, _ := json.Marshal(map[string]interface{}{
+  // use json.Marshal with an anonymous variable to escape the \t and " characters
+  // in the response
+  j, err := json.Marshal(map[string]interface{}{
     "error": "nil",
     "response": output,
   })
+  if err != nil {
+    fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+    return
+  }
 
-	// FIXME change "response" to something more meaningful
 	fmt.Fprintf(w, string(j))
 }
 
