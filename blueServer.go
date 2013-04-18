@@ -15,9 +15,6 @@ import (
 // This regexp is used to find words in sentences
 var sentencesRegexp *regexp.Regexp
 
-// This regexp is used to find @include directives in html files
-var includeRegexp *regexp.Regexp
-
 func main() {
 	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
 
@@ -30,11 +27,6 @@ func main() {
 
 	// compile regexp used for separating marked words in sentences, panic on error
 	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
-	if err != nil {
-		panic(err)
-	}
-	// compile regexp used for finding @include directives, panic on error
-	includeRegexp, err = regexp.Compile("@include: (.*)$")
 	if err != nil {
 		panic(err)
 	}

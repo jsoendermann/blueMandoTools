@@ -1,8 +1,9 @@
 package main
 
 import (
-  "strings"
-  "io/ioutil"
+	"io/ioutil"
+	"strings"
+  "regexp"
 )
 
 // This is a helper function that loads a text file into a string it returns
@@ -34,9 +35,24 @@ func loadHtmlFile(file string) string {
 	return html
 }
 
+// This regexp is used to find @include directives in html files in the function
+// below
+var includeRegexp *regexp.Regexp
+
 // includeFiles parses and executes @include statements. It recurses until no more
 // @include's are left in the file.
 func includeFiles(htmlBeforeIncludes string) string {
+	if includeRegexp == nil {
+		// compile regexp used for finding @include directives, panic on error
+
+    // it's necessary to declare the error before calling the function
+    // to avoid defining a local includeRegexp
+    var err error
+    includeRegexp, err = regexp.Compile("@include: (.*)$")
+		if err != nil {
+			panic(err)
+		}
+	}
 	var output string
 
 	lines := strings.Split(htmlBeforeIncludes, "\n")
