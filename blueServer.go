@@ -12,12 +12,68 @@ import (
 	"strings"
 )
 
-
 // This regexp is used to find words in sentences
 var sentencesRegexp *regexp.Regexp
 
 // This regexp is used to find @include directives in html files
 var includeRegexp *regexp.Regexp
+
+func main() {
+	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
+
+	// Load Db, panic on error and defer close
+	err := cedict.LoadDb()
+	if err != nil {
+		panic(err)
+	}
+	defer cedict.CloseDb()
+
+	// compile regexp used for separating marked words in sentences, panic on error
+	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
+	if err != nil {
+		panic(err)
+	}
+	// compile regexp used for finding @include directives, panic on error
+	includeRegexp, err = regexp.Compile("@include: (.*)$")
+	if err != nil {
+		panic(err)
+	}
+
+	// these two variables hold the content of the two static html files
+	vocabHtml := loadHtmlFile("vocab.html")
+	sentencesHtml := loadHtmlFile("sentences.html")
+
+	// set active class in navbar
+	// FIXME find a better way to do this
+	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
+	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+
+	// Set up the http server
+
+	// the root is handled by an anonymous function that redirects to "/sentences/"
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, sentencesPath, http.StatusFound)
+	})
+
+	// /vocab/ and /sentences/ are both handled by simple, anonymous functions that
+	// write static html to the ResponseWriter
+	http.HandleFunc(vocabPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, vocabHtml)
+	})
+	http.HandleFunc(sentencesPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, sentencesHtml)
+	})
+
+	// json api (/vocab/lookup/ and /sentences/lookup/)
+	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
+	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
+
+	// assets file server
+	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
+
+	// start server
+	http.ListenAndServe(":8080", nil)
+}
 
 // This function is responsible for paths of the form
 // /vocab/lookup/<word> and returns a json dictionary
@@ -81,7 +137,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
-  sentence, colors := getRequestDataAndColors(r)
+	sentence, colors := getRequestDataAndColors(r)
 
 	// get words in sentence
 	wordsRaw := sentencesRegexp.FindAllStringSubmatch(sentence, -1)
@@ -174,7 +230,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 // and the color array from the post data in the request
 func getRequestDataAndColors(r *http.Request) (string, []string) {
 	// get the word or sentence from the path
-  pathElements := strings.Split(r.URL.Path, "/")
+	pathElements := strings.Split(r.URL.Path, "/")
 	requestData := pathElements[len(pathElements)-1]
 
 	// get colors
@@ -183,64 +239,5 @@ func getRequestDataAndColors(r *http.Request) (string, []string) {
 		colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
 	}
 
-  return requestData, colors
+	return requestData, colors
 }
-
-func main() {
-	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
-
-	// Load Db, panic on error and defer close
-	err := cedict.LoadDb()
-	if err != nil {
-		panic(err)
-	}
-	defer cedict.CloseDb()
-
-	// compile regexp used for separating marked words in sentences, panic on error
-	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
-	if err != nil {
-		panic(err)
-	}
-	// compile regexp used for finding @include directives, panic on error
-	includeRegexp, err = regexp.Compile("@include: (.*)$")
-	if err != nil {
-		panic(err)
-	}
-
-  // these two variables hold the content of the two static html files
-	vocabHtml := loadHtmlFile("vocab.html")
-	sentencesHtml := loadHtmlFile("sentences.html")
-
-	// set active class in navbar
-	// FIXME find a better way to do this
-	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
-	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
-
-	// Set up the http server
-
-	// the root is handled by an anonymous function that redirects to "/sentences/"
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, sentencesPath, http.StatusFound)
-	})
-
-	// /vocab/ and /sentences/ are both handled by simple, anonymous functions that
-	// write static html to the ResponseWriter
-	http.HandleFunc(vocabPath, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, vocabHtml)
-	})
-	http.HandleFunc(sentencesPath, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, sentencesHtml)
-	})
-
-	// json api (/vocab/lookup/ and /sentences/lookup/)
-	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
-	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
-
-	// assets file server
-	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
-
-	// start server
-	http.ListenAndServe(":8080", nil)
-}
-
-
