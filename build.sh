@@ -4,7 +4,7 @@ rm -rf ./build
 mkdir ./build
 mkdir ./build/assets
 
-# Copy files from asstes to build, compile to .js if it's a .coffee file
+# Copy files from assets to build, compile to .js if it's a .coffee file
 for f in ./assets/*; do
   if echo "$f" | grep -qE ".coffee$"; then
     echo "Compiling $f"

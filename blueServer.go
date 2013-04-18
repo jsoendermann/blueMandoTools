@@ -54,7 +54,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// check if there were no matches in the db
+	// check if there were any matches in the db
 	if len(records) == 0 {
 		fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
@@ -115,7 +115,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 			// find entry, return on error
 			entry, err := moedict.FindEntry(word)
 			if err != nil {
-				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 				return
 			}
 
@@ -132,7 +132,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 			// find cedict records
 			records, err := cedict.FindRecords(word, chinese.Simp)
 			if err != nil {
-				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 				return
 			}
 
@@ -140,7 +140,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 			for _, record := range records {
 				entry, err := moedict.FindEntry(record.Trad)
 				if err != nil {
-					fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+					fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 					return
 				}
 
@@ -174,7 +174,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+sentence+`"}`)
+		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 		return
 	}
 
