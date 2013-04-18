@@ -36,14 +36,7 @@ var includeRegexp *regexp.Regexp
 // or an "error" field of something other than "nil" if an
 // error occured during execution.
 func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
-	// get the word from the path
-	word := r.URL.Path[len(vocabLookupPath):]
-
-	// get colors from post data
-	colors := make([]string, 5)
-	for i := 0; i <= 4; i++ {
-		colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
-	}
+	word, colors := getRequestDataAndColors(r)
 
 	// search the db for records (simp first, if unsuccessful, try trad)
 	// and send errors back to client if any occur
@@ -99,14 +92,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
-	// get the sentence from the path
-	sentence := r.URL.Path[len(sentencesLookupPath):]
-
-	// get colors
-	colors := make([]string, 5)
-	for i := 0; i <= 4; i++ {
-		colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
-	}
+  sentence, colors := getRequestDataAndColors(r)
 
 	// get words in sentence
 	wordsRaw := sentencesRegexp.FindAllStringSubmatch(sentence, -1)
@@ -195,6 +181,22 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
+// getRequestDataAndColors gets the word or sentence from the url
+// and the color array from the post data in the request
+func getRequestDataAndColors(r *http.Request) (string, []string) {
+	// get the word or sentence from the path
+  pathElements := strings.Split(r.URL.Path, "/")
+	requestData := pathElements[len(pathElements)-1]
+
+	// get colors
+	colors := make([]string, 5)
+	for i := 0; i <= 4; i++ {
+		colors[i] = r.FormValue(fmt.Sprintf("tone%d", i))
+	}
+
+  return requestData, colors
+}
+
 func main() {
 	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
 
@@ -216,6 +218,7 @@ func main() {
 		panic(err)
 	}
 
+  // these two variables hold the content of the two static html files
 	vocabHtml := loadHtmlFile("vocab.html")
 	sentencesHtml := loadHtmlFile("sentences.html")
 
@@ -303,7 +306,6 @@ func includeFiles(htmlBeforeIncludes string) string {
 	// call this method recursively if there were files included
 	// to also handle @include statements in the included files
 	if filesIncluded {
-
 		return includeFiles(output)
 	}
 	return output
