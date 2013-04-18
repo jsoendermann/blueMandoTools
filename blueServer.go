@@ -37,6 +37,8 @@ var vocabHtml, sentencesHtml string
 
 // This regexp is used to find words in sentences
 var sentencesRegexp *regexp.Regexp
+// This regexp is used to find @include directives in html files
+var includeRegexp *regexp.Regexp
 
 // The indexHandler redirects the user to the sentences page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -228,14 +230,21 @@ func main() {
 	}
 	defer cedict.CloseDb()
 
-	// Load HTML data into memory
-	loadHTMLFiles()
-
 	// compile regexp used for separating marked words in sentences, panic on error
 	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
 	if err != nil {
 		panic(err)
 	}
+  // compile regexp used for finding @include directives, panic on error
+  includeRegexp, err = regexp.Compile("@include: (.*)$")
+  if err != nil {
+		panic(err)
+	}
+
+  // Load HTML data into memory
+	loadHTMLFiles()
+
+
 
 	// Set up the http server
 
@@ -275,11 +284,31 @@ func loadHTMLFiles() {
 	sentencesHtmlView := loadFilePanicOnError("sentences.html")
 
 	// combine the layout and the two views into complete html
-	vocabHtml = strings.Replace(applicationHtml, "@yield@", vocabHtmlView, 1)
-	sentencesHtml = strings.Replace(applicationHtml, "@yield@", sentencesHtmlView, 1)
+	vocabHtml = strings.Replace(applicationHtml, "@yield", vocabHtmlView, 1)
+	sentencesHtml = strings.Replace(applicationHtml, "@yield", sentencesHtmlView, 1)
+
+  vocabHtml = includeHTMLFiles(vocabHtml)
+  sentencesHtml = includeHTMLFiles(sentencesHtml)
 
 	// set active class in navbar
 	// FIXME move this into compile stage
 	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
 	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+}
+
+func includeHTMLFiles(htmlBeforeIncludes string) string {
+  var output string
+
+  lines := strings.Split(htmlBeforeIncludes, "\n")
+
+  for _,line := range lines {
+    matches := includeRegexp.FindStringSubmatch(line)
+    if len(matches) > 0 {
+      output += loadFilePanicOnError(matches[1])
+    } else {
+      output += line + "\n"
+    }
+  }
+
+  return output
 }
