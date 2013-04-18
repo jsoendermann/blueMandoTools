@@ -24,36 +24,15 @@ const (
 	assetsPath = "/assets/"
 )
 
-// The length of the lookup paths, used to separate
-// the words from the url
-const (
-	vocabLookupPathLength     = len(vocabLookupPath)
-	sentencesLookupPathLength = len(sentencesLookupPath)
-)
-
 // The HTML for the two pages is loaded into these variables
 // to avoid having to load them on each request
 var vocabHtml, sentencesHtml string
 
 // This regexp is used to find words in sentences
 var sentencesRegexp *regexp.Regexp
+
 // This regexp is used to find @include directives in html files
 var includeRegexp *regexp.Regexp
-
-// The indexHandler redirects the user to the sentences page
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, sentencesPath, http.StatusFound)
-}
-
-// vocabHandler is a simple function that delivers the static html for the vocab page
-func vocabHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, vocabHtml)
-}
-
-// sentenceHandler is a simple function that delivers the static html for the sentences page
-func sentenceHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, sentencesHtml)
-}
 
 // This function is responsible for paths of the form
 // /vocab/lookup/<word> and returns a json dictionary
@@ -62,7 +41,7 @@ func sentenceHandler(w http.ResponseWriter, r *http.Request) {
 // error occured during execution.
 func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// get the word from the path
-	word := r.URL.Path[vocabLookupPathLength:]
+	word := r.URL.Path[len(vocabLookupPath):]
 
 	// get colors from post data
 	colors := make([]string, 5)
@@ -125,7 +104,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// get the sentence from the path
-	sentence := r.URL.Path[sentencesLookupPathLength:]
+	sentence := r.URL.Path[len(sentencesLookupPath):]
 
 	// get colors
 	colors := make([]string, 5)
@@ -235,25 +214,33 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-  // compile regexp used for finding @include directives, panic on error
-  includeRegexp, err = regexp.Compile("@include: (.*)$")
-  if err != nil {
+	// compile regexp used for finding @include directives, panic on error
+	includeRegexp, err = regexp.Compile("@include: (.*)$")
+	if err != nil {
 		panic(err)
 	}
 
-  // Load HTML data into memory
+	// Load HTML data into memory
 	loadHTMLFiles()
-
-
 
 	// Set up the http server
 
+  //FIXME comment
 	// root
-	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, sentencesPath, http.StatusFound)
+	})
 
+  // FIXME comment
 	// static pages
-	http.HandleFunc(vocabPath, vocabHandler)
-	http.HandleFunc(sentencesPath, sentenceHandler)
+	http.HandleFunc(vocabPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, vocabHtml)
+	})
+
+  // FIXME comment
+	http.HandleFunc(sentencesPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, sentencesHtml)
+	})
 
 	// json api
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
@@ -287,8 +274,8 @@ func loadHTMLFiles() {
 	vocabHtml = strings.Replace(applicationHtml, "@yield", vocabHtmlView, 1)
 	sentencesHtml = strings.Replace(applicationHtml, "@yield", sentencesHtmlView, 1)
 
-  vocabHtml = includeHTMLFiles(vocabHtml)
-  sentencesHtml = includeHTMLFiles(sentencesHtml)
+	vocabHtml = includeHTMLFiles(vocabHtml)
+	sentencesHtml = includeHTMLFiles(sentencesHtml)
 
 	// set active class in navbar
 	// FIXME move this into compile stage
@@ -297,18 +284,18 @@ func loadHTMLFiles() {
 }
 
 func includeHTMLFiles(htmlBeforeIncludes string) string {
-  var output string
+	var output string
 
-  lines := strings.Split(htmlBeforeIncludes, "\n")
+	lines := strings.Split(htmlBeforeIncludes, "\n")
 
-  for _,line := range lines {
-    matches := includeRegexp.FindStringSubmatch(line)
-    if len(matches) > 0 {
-      output += loadFilePanicOnError(matches[1])
-    } else {
-      output += line + "\n"
-    }
-  }
+	for _, line := range lines {
+		matches := includeRegexp.FindStringSubmatch(line)
+		if len(matches) > 0 {
+			output += loadFilePanicOnError(matches[1])
+		} else {
+			output += line + "\n"
+		}
+	}
 
-  return output
+	return output
 }
