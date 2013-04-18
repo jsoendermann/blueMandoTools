@@ -24,10 +24,6 @@ const (
 	assetsPath = "/assets/"
 )
 
-// The HTML for the two pages is loaded into these variables
-// to avoid having to load them on each request
-var vocabHtml, sentencesHtml string
-
 // This regexp is used to find words in sentences
 var sentencesRegexp *regexp.Regexp
 
@@ -220,29 +216,31 @@ func main() {
 		panic(err)
 	}
 
-	// Load HTML data into memory
-	loadHTMLFiles()
+	vocabHtml := loadHtmlFile("vocab.html")
+	sentencesHtml := loadHtmlFile("sentences.html")
+
+	// set active class in navbar
+	// FIXME find a better way to do this
+	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
+	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
 
 	// Set up the http server
 
-  //FIXME comment
-	// root
+	// the root is handled by an anonymous function that redirects to "/sentences/"
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, sentencesPath, http.StatusFound)
 	})
 
-  // FIXME comment
-	// static pages
+	// /vocab/ and /sentences/ are both handled by simple, anonymous functions that
+	// write static html to the ResponseWriter
 	http.HandleFunc(vocabPath, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, vocabHtml)
 	})
-
-  // FIXME comment
 	http.HandleFunc(sentencesPath, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, sentencesHtml)
 	})
 
-	// json api
+	// json api (/vocab/lookup/ and /sentences/lookup/)
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 
@@ -255,7 +253,7 @@ func main() {
 
 // This is a helper function that loads a text file into a string it returns
 // and panics if an error occurs.
-func loadFilePanicOnError(filename string) string {
+func loadTextFilePanicOnError(filename string) string {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -263,39 +261,50 @@ func loadFilePanicOnError(filename string) string {
 	return string(data)
 }
 
-// This function loads and prepares the static html files for the server.
-func loadHTMLFiles() {
-	// Load the html for the two pages into memory, panic on error
-	applicationHtml := loadFilePanicOnError("application.html")
-	vocabHtmlView := loadFilePanicOnError("vocab.html")
-	sentencesHtmlView := loadFilePanicOnError("sentences.html")
+// loadHtmlFile loads the file given to it in the parameter, adds the layout file
+// around it, parses and executes all @include statments in the file and in included
+// files and returns the resulting html string.
+func loadHtmlFile(file string) string {
+	// load layout file
+	layoutHtml := loadTextFilePanicOnError("layout.html")
 
-	// combine the layout and the two views into complete html
-	vocabHtml = strings.Replace(applicationHtml, "@yield", vocabHtmlView, 1)
-	sentencesHtml = strings.Replace(applicationHtml, "@yield", sentencesHtmlView, 1)
+	// load html files
+	html := loadTextFilePanicOnError(file)
 
-	vocabHtml = includeHTMLFiles(vocabHtml)
-	sentencesHtml = includeHTMLFiles(sentencesHtml)
+	// add layout around the html view
+	html = strings.Replace(layoutHtml, "@yield", html, 1)
 
-	// set active class in navbar
-	// FIXME move this into compile stage
-	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
-	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+	// execute @include statements in file
+	html = includeFiles(html)
+
+	return html
 }
 
-func includeHTMLFiles(htmlBeforeIncludes string) string {
+// includeFiles parses and executes @include statements. It recurses until no more
+// @include's are left in the file.
+func includeFiles(htmlBeforeIncludes string) string {
 	var output string
 
 	lines := strings.Split(htmlBeforeIncludes, "\n")
 
+	// this is to check if any new files were included in this pass
+	filesIncluded := false
+
 	for _, line := range lines {
 		matches := includeRegexp.FindStringSubmatch(line)
 		if len(matches) > 0 {
-			output += loadFilePanicOnError(matches[1])
+			filesIncluded = true
+			output += loadTextFilePanicOnError(matches[1])
 		} else {
 			output += line + "\n"
 		}
 	}
 
+	// call this method recursively if there were files included
+	// to also handle @include statements in the included files
+	if filesIncluded {
+
+		return includeFiles(output)
+	}
 	return output
 }
