@@ -82,7 +82,7 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
-	if records == nil {
+	if len(records) == 0 {
 		records, err = cedict.FindRecords(word, chinese.Trad)
 		if err != nil {
 			fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
