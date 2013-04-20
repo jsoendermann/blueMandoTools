@@ -13,14 +13,19 @@ Once you have installed all the requirements, you can install go by changing int
 ## Running BlueServer
 
 To run blueServer, change into the build/ subdirectory of your installation and type blueServer. Building and executing the server can be combined by executing
-        ./build.sh && (cd build && CEDICT_DB="/path/to/cedict.sqlite3" blueServer )
+
+    ./build.sh && (cd build && CEDICT_DB="/path/to/cedict.sqlite3" blueServer )
+
 in a terminal.
 
 ## Implementation Details
 
 BlueServer is written in Go using "net/http". blueServer.go contains the main() function that sets up the webserver. Once it is running, it responds to the following routes:
-        /vocab/
-        /vocab/lookup/<word>
-        /sentences/
-        /sentences/lookup/<sentence>
-        /assets/<file>
+
+    /vocab/
+    /vocab/lookup/<word>
+    /sentences/
+    /sentences/lookup/<sentence>
+    /assets/<file>
+
+a
