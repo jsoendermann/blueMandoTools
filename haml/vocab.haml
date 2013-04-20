@@ -21,11 +21,11 @@
     %ol
       %li
         If this is the first time you use this service, please download a vocab deck to import to: 
-        %a{href: "/assets/Vocab-simp.apkg"} Simplified
+        %a{:href => "/assets/Vocab-simp.apkg"} Simplified
         :escaped
           /
         = succeed '.' do
-          %a{href: "/assets/Vocab-trad.apkg"} Traditional
+          %a{:href => "/assets/Vocab-trad.apkg"} Traditional
 
         :escaped
           You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <simp>\t<trad>\t<pinyin&english>.
