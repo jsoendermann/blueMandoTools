@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"regexp"
 	"strings"
-  "regexp"
-  "net/http"
-  "fmt"
 )
 
 // This is a helper function that loads a text file into a string it returns
@@ -47,10 +47,10 @@ func includeFiles(htmlBeforeIncludes string) string {
 	if includeRegexp == nil {
 		// compile regexp used for finding @include directives, panic on error
 
-    // it's necessary to declare the error before calling the function
-    // to avoid defining a local includeRegexp
-    var err error
-    includeRegexp, err = regexp.Compile("@include: (.*)$")
+		// it's necessary to declare the error before calling the function
+		// to avoid defining a local includeRegexp
+		var err error
+		includeRegexp, err = regexp.Compile("@include: (.*)$")
 		if err != nil {
 			panic(err)
 		}
