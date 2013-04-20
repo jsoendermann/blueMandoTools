@@ -2,7 +2,7 @@
 %form.well
   %label
     :markdown
-      This page takes a list of Chinese sentences, looks up words you don't know in [a dictionary](link) and produces beautiful Anki cards of the type you can see in [this screenshot](asdf). The sentences can be simp/trad but the explanations on the cards will always be in traditional characters. To try it out, follow the instructions below.
+      This page takes a list of Chinese sentences, looks up words you don't know in [a dictionary](http://dict.revised.moe.edu.tw/index.html) and produces beautiful Anki cards of the type you can see in [this screenshot](/assets/sentences.png). The sentences can be simp/trad but the explanations on the cards will always be in traditional characters. To try it out, follow the instructions below.
   %h3 Sentence List
   %textarea.span7#sc-sentences(rows="8" placeholder="Add sentences here, separated by newlines, with the words that you want to look up in brackets. Example: [你好]我是[德國]人。")
 
@@ -21,9 +21,10 @@
     %ol
       %li
         If this is the first time you use this service, please download a sentences deck to import to 
-        %a{href: "#"} here
+        = succeed '.' do
+          %a{href: "/assets/Sentences.apkg"} here
         :escaped
-          (you can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <sentence>\t<explanations>).
+          You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <sentence>\t<explanations>.
       %li Copy the contents of the text area below to a text file and save the file (you will delete this file later).
       %li Open your sentences deck in Anki and select File→Import.
       %li Make sure "Allow HTML in fields" is checked and click on "Import".

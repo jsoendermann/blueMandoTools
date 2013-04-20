@@ -2,7 +2,7 @@
 %form.well
   %label
     :markdown
-      This page takes a list of simplified or traditional Chinese words and turns them into Anki cards with the word on the front and pinyin and English definitions on the back. You can see an example of the type of cards this page produces [here]().
+      This page takes a list of simplified or traditional Chinese words and turns them into Anki cards with the word on the front and pinyin and English definitions on the back. You can see an example of the type of cards this page produces [here](/assets/vocab-expl.png).
   %h3 Word List
   %textarea.span7#vc-words(rows="8" placeholder="Add words here, separated by newlines.")
 
@@ -21,11 +21,11 @@
     %ol
       %li
         If this is the first time you use this service, please download a vocab deck to import to: 
-        %a{href: "#"} Simplified
+        %a{href: "/assets/Vocab-simp.apkg"} Simplified
         :escaped
           /
         = succeed '.' do
-          %a{href: "#"} Traditional
+          %a{href: "/assets/Vocab-trad.apkg"} Traditional
 
         :escaped
           You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <simp>\t<trad>\t<pinyin&english>.
