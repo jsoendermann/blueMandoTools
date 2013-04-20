@@ -14,3 +14,6 @@ Once you have installed all the requirements, you can install go by changing int
 To run blueServer, change into the build/ subdirectory of your installation and type blueServer. Building and executing the server can be combined by executing
     ./build.sh && (cd build && CEDICT_DB="/path/to/cedict.sqlite3" blueServer )
 in a terminal.
+
+## Implementation Details
+
