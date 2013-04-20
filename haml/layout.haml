@@ -3,13 +3,13 @@
   %head
     %title The Blue Mandarin Lab - Card Generator
 
-    %link{:rel => "stylesheet", type: "text/css", href: "/assets/bootstrap.css"}
+    %link{:rel => "stylesheet", :type => "text/css", :href => "/assets/bootstrap.css"}
 
-    %script{src: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
-    %script{src: "/assets/shared.js"}
-    %script{src: "/assets/bootstrap.js"}
-    %script{src: "/assets/vocab.js"}
-    %script{src: "/assets/sentences.js"}
+    %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
+    %script{:src => "/assets/shared.js"}
+    %script{:src => "/assets/bootstrap.js"}
+    %script{:src => "/assets/vocab.js"}
+    %script{:src => "/assets/sentences.js"}
 
   %body(style="padding-top: 60px;")
     .navbar.navbar-inverse.navbar-fixed-top
@@ -22,7 +22,7 @@
                 -# TODO Find a better solution for this css hack
                 %a(href="/vocab/" style="padding-left: 0;") Vocab Cards
               %li#sentences-link
-                %a{href: "/sentences/"} Sentence Cards
+                %a{:href => "/sentences/"} Sentence Cards
 
 
     .container
