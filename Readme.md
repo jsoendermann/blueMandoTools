@@ -24,11 +24,11 @@ BlueServer is written in Go using "net/http". blueServer.go contains the main() 
 
     @include other-file.html
 
-directive and all files use a common layout that yields with the 
+directive and all files use a common layout that yields with 
 
     @yield
 
-statement. This is implemented in the loadHtmlFile() and includeFiles() functions in blueServer_util.go.
+This is implemented in the loadHtmlFile() and includeFiles() functions in blueServer_util.go.
 
 After assembling the static html, the main function sets up the web server by registering handlers for all routes and calling
    http.ListenAndServe(":8080", nil)
@@ -41,7 +41,7 @@ Once it is running, BlueServer responds to the following routes:
     /sentences/lookup/<sentence>
     /assets/<file>
 
-/vocab/ and /sentences/ are handled by small anonymous functions that deliver the static html and /assets/ is handled by a http.FileServer that serves all the assets. Most of the code in blueServer.go is responsible for the json api at /vocab/lookup/ and /sentences/lookup/.
+/vocab/ and /sentences/ are handled by small anonymous functions that deliver statc html and /assets/ is handled by a http.FileServer that serves all the assets. Most of the code in blueServer.go is responsible for the json api at /vocab/lookup/ and /sentences/lookup/.
 
 This api is called by the coffee script code which sends ajax requests to the server when the user wants to look up words or sentences.
 
