@@ -20,7 +20,7 @@ in a terminal.
 
 ## Implementation Details
 
-BlueServer is written in Go using "net/http". blueServer.go contains the main() function that sets up the program. It first reads all html files into memory. BlueServer implements a primitive rails-style view system where html files can include other files with the
+BlueServer is written in Go using "net/http". blueServer.go contains the main() function that sets up the program. It first reads all html files into memory. BlueServer implements a simple rails-style view system where html files can include other files with the
 
     @include other-file.html
 
