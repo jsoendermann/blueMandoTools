@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+  "github.com/hoisie/mustache"
 )
 
 // This regexp is used to find words in sentences
@@ -32,13 +33,14 @@ func main() {
 	}
 
 	// these two variables hold the content of the two static html files
-	vocabHtml := loadHtmlFile("vocab.html")
-	sentencesHtml := loadHtmlFile("sentences.html")
+	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
+	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
 
+  // FIXME reimplement this
 	// set active class in navbar
 	// FIXME find a better way to do this
-	vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
-	sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+	// vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
+	// sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
 
 	// Set up the http server
 

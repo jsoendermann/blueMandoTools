@@ -25,8 +25,7 @@ done
 for f in ./haml/*; do
   echo "Compiling $f"
   b=`basename $f`
-  # FIXME this does not work if the filename contains "haml"
-  haml $f > ./build/${b/haml/html}
+  haml $f > ./build/${b/.haml/}
 done
 
 go install
