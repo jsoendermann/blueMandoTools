@@ -20,17 +20,9 @@ in a terminal.
 
 ## Implementation Details
 
-BlueServer is written in Go using "net/http". blueServer.go contains the main() function that sets up the program. It first reads all html files into memory. BlueServer implements a simple rails-style view system where html files can include other files with the
+BlueServer is written in Go using "net/http". blueServer.go contains the main() function that sets up the program. 
 
-    @include other-file.html
-
-directive and all files use a common layout that yields with 
-
-    @yield
-
-This is implemented in the loadHtmlFile() and includeFiles() functions in blueServer_util.go.
-
-After assembling the static html, the main function sets up the web server by registering handlers for all routes and calling
+After assembling the static html using mustache.go, the main function sets up the web server by registering handlers for all routes and calling
    http.ListenAndServe(":8080", nil)
 
 Once it is running, BlueServer responds to the following routes:
