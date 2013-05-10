@@ -14,7 +14,7 @@ import (
 )
 
 // This regexp is used to find words in sentences
-var sentencesRegexp *regexp.Regexp
+var findWordsInSentencesRegexp *regexp.Regexp
 
 func main() {
 	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
@@ -25,7 +25,7 @@ func main() {
 	}
 	defer cedict.CloseDb()
 
-	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
+	findWordsInSentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
 	if err != nil {
 		panic(err)
 	}
@@ -128,7 +128,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	sentence, colors := getRequestDataAndColors(r)
 
 	// get words in sentence
-	wordsRaw := sentencesRegexp.FindAllStringSubmatch(sentence, -1)
+	wordsRaw := findWordsInSentencesRegexp.FindAllStringSubmatch(sentence, -1)
 	words := make([]string, len(wordsRaw))
 	for i, w := range wordsRaw {
 		words[i] = w[1]
