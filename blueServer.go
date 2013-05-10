@@ -70,7 +70,8 @@ func main() {
 // or an "error" field of something other than "nil" if an
 // error occured during execution.
 func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
-	word, colors := getRequestDataAndColors(request)
+	word := getLastPathComponent(request)
+	colors := getColors(request)
 
 	// search the db for records (simp first, if unsuccessful, try trad)
 	// and send errors back to client if any occur
@@ -125,7 +126,8 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
-	sentence, colors := getRequestDataAndColors(request)
+	sentence := getLastPathComponent(request)
+	colors := getColors(request)
 
 	// get words in sentence
 	wordsRaw := findWordsInSentencesRegexp.FindAllStringSubmatch(sentence, -1)
@@ -207,4 +209,3 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	fmt.Fprintf(writer, string(j))
 }
-
