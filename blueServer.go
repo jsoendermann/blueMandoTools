@@ -42,17 +42,17 @@ func main() {
 	// Set up the http server
 
 	// the root is handled by an anonymous function that redirects to "/sentences/"
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, sentencesPath, http.StatusFound)
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, sentencesPath, http.StatusFound)
 	})
 
 	// /vocab/ and /sentences/ are both handled by simple, anonymous functions that
 	// write static html to the ResponseWriter
-	http.HandleFunc(vocabPath, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, vocabHtml)
+	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, vocabHtml)
 	})
-	http.HandleFunc(sentencesPath, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, sentencesHtml)
+	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, sentencesHtml)
 	})
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
@@ -69,27 +69,27 @@ func main() {
 // containing the csv to be added to the output text area
 // or an "error" field of something other than "nil" if an
 // error occured during execution.
-func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
-	word, colors := getRequestDataAndColors(r)
+func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
+	word, colors := getRequestDataAndColors(request)
 
 	// search the db for records (simp first, if unsuccessful, try trad)
 	// and send errors back to client if any occur
 	records, err := cedict.FindRecords(word, chinese.Simp)
 	if err != nil {
-		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 	if len(records) == 0 {
 		records, err = cedict.FindRecords(word, chinese.Trad)
 		if err != nil {
-			fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+			fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 			return
 		}
 
 	}
 
 	if len(records) == 0 {
-		fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
+		fmt.Fprintf(writer, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
 	}
 
@@ -117,15 +117,15 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
-	fmt.Fprintf(w, string(j))
+	fmt.Fprintf(writer, string(j))
 }
 
-func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
-	sentence, colors := getRequestDataAndColors(r)
+func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
+	sentence, colors := getRequestDataAndColors(request)
 
 	// get words in sentence
 	wordsRaw := findWordsInSentencesRegexp.FindAllStringSubmatch(sentence, -1)
@@ -146,7 +146,7 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 		for i, word := range words {
 			entry, err := moedict.FindEntry(word)
 			if err != nil {
-				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 				return
 			}
 
@@ -161,14 +161,14 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 			records, err := cedict.FindRecords(word, chinese.Simp)
 			if err != nil {
-				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 				return
 			}
 
 			for _, record := range records {
 				entry, err := moedict.FindEntry(record.Trad)
 				if err != nil {
-					fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+					fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 					return
 				}
 
@@ -201,9 +201,10 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 		return
 	}
 
-	fmt.Fprintf(w, string(j))
+	fmt.Fprintf(writer, string(j))
 }
+
