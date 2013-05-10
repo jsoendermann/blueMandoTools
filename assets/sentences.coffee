@@ -1,5 +1,4 @@
-# Document ready
-$( ->
+$(document).ready( ->
   # Button: Lookup Words
   $('#sc-lookup').on('click', ->
     scLookupClicked()

@@ -1,5 +1,4 @@
-# Document ready
-$( ->
+$(document).ready( ->
   # Button: Lookup Words
   $('#vc-lookup').on('click', ->
     vcLookupClicked()
