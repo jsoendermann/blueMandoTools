@@ -12,7 +12,8 @@
     )
   )
 
-# this function adds a line of text to a text area and scrolls down so it's visible
+# this function adds a line of text to a text area and scrolls down so the new line
+# is visible
 @textAreaAddLineAndScroll = (textAreaId, line) ->
   ta = $(textAreaId)
 

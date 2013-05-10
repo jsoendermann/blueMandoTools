@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hoisie/mustache"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
 	"github.com/yangchuanzhang/moedict"
@@ -10,7 +11,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-  "github.com/hoisie/mustache"
 )
 
 // This regexp is used to find words in sentences
@@ -19,24 +19,21 @@ var sentencesRegexp *regexp.Regexp
 func main() {
 	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
 
-	// Load Db, panic on error and defer close
 	err := cedict.LoadDb()
 	if err != nil {
 		panic(err)
 	}
 	defer cedict.CloseDb()
 
-	// compile regexp used for separating marked words in sentences, panic on error
 	sentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
 	if err != nil {
 		panic(err)
 	}
 
-	// these two variables hold the content of the two static html files
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
 
-  // FIXME reimplement this
+	// FIXME reimplement this
 	// set active class in navbar
 	// FIXME find a better way to do this
 	// vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
@@ -58,14 +55,12 @@ func main() {
 		fmt.Fprintf(w, sentencesHtml)
 	})
 
-	// json api (/vocab/lookup/ and /sentences/lookup/)
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
 
-	// start server
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -93,7 +88,6 @@ func vocabLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// check if there were any matches in the db
 	if len(records) == 0 {
 		fmt.Fprintf(w, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
@@ -140,7 +134,6 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 		words[i] = w[1]
 	}
 
-	// determine char set
 	charSet := cedict.DetermineCharSet(sentence)
 
 	// get moe entries
@@ -151,7 +144,6 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO explain diff. between trad and simp
 	if charSet == chinese.Trad {
 		for i, word := range words {
-			// find entry, return on error
 			entry, err := moedict.FindEntry(word)
 			if err != nil {
 				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
@@ -165,17 +157,14 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// (there may be multiple records per word) and find moedict records using
 	// the traditional word of the cedict records.
 	if charSet == chinese.Simp {
-		// go through words
 		for _, word := range words {
 
-			// find cedict records
 			records, err := cedict.FindRecords(word, chinese.Simp)
 			if err != nil {
 				fmt.Fprintf(w, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 				return
 			}
 
-			// find moedict records for record
 			for _, record := range records {
 				entry, err := moedict.FindEntry(record.Trad)
 				if err != nil {
@@ -191,7 +180,6 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 	// construct csv row
 	var output string
 
-	// remove brackets from string
 	var outputSentence string
 	outputSentence = strings.Replace(sentence, "[", "", -1)
 	outputSentence = strings.Replace(outputSentence, "]", "", -1)
@@ -219,4 +207,3 @@ func sentencesLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, string(j))
 }
-
