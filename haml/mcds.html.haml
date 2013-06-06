@@ -1,30 +1,34 @@
-%h1 Sentence Cards
+%h1 MCDs
 %form.well
   %label
     :markdown
-      This page takes a list of Chinese sentences, looks up words you don't know in [a dictionary](http://dict.revised.moe.edu.tw/index.html) and produces beautiful Anki cards of the type you can see on [this screenshot](/assets/images/sentences.png). The sentences can be simp/trad but the explanations on the cards will always be in traditional characters. To try it out, follow the instructions below.
-  %h3 Sentence List
-  %textarea.span7#sc-sentences(rows="8" placeholder="Add sentences here, separated by newlines, with the words that you want to look up in brackets. Example: [你好]我是[德國]人。")
+      @@@@This page takes a list of Chinese sentences, looks up words you don't know in [a dictionary](http://dict.revised.moe.edu.tw/index.html) and produces beautiful Anki cards of the type you can see on [this screenshot](/assets/images/sentences.png). The sentences can be simp/trad but the explanations on the cards will always be in traditional characters. To try it out, follow the instructions below.@@@
+  
+  <br>
+
+  -# FIXME This is probably not how this is supposed to be done
+  #notes-label-input{style: "float:right;"}
+    %h3 Notes
+    %textarea.span3#mcds-notes(rows="8" placeholder="@@@@")
+  %h3 Input
+  %textarea.span4#mcds-input(rows="8" placeholder="@@@@" width="100%")
+  
+
+
 
   <br>
 
-  {{> tone-color-wells}}
+  #mcds-display
+    :plain
+      ...
+
+  %h3 Cloze codes
+  %input#mcds-code-input
+
+  %h3 Raw MCDs without Dictionary Entries
+  %textarea.span7#mcds-output(rows="4")
 
   <br><br>
-
-  %label
-    To import the generated cards to Anki, please follow these steps:
-    %ol
-      %li
-        If this is the first time you use this service, please download a sentences deck to import to 
-        = succeed '.' do
-          %a{:href => "/assets/anki-decks/Sentences.apkg"} here
-        :escaped
-          You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <sentence>\t<explanations>.
-      %li Copy the contents of the text area below to a text file and save the file (you will delete this file later).
-      %li Open your sentences deck in Anki and select File→Import.
-      %li Make sure "Allow HTML in fields" is checked and click on "Import".
-      %li The cards should now appear in your deck and you can delete the text file you created in step 2.
 
   %a.btn.btn-primary#sc-lookup Look up sentences
 
