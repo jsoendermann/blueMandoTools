@@ -32,6 +32,7 @@ func main() {
 
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
+  mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
 
 	// FIXME reimplement this
 	// set active class in navbar
@@ -54,9 +55,13 @@ func main() {
 	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, sentencesHtml)
 	})
+	http.HandleFunc(mcdsPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, mcdsHtml)
+	})
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
+	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
@@ -208,4 +213,8 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	fmt.Fprintf(writer, string(j))
+}
+
+func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
+  return
 }
