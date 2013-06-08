@@ -2,40 +2,30 @@
 %form.well
   %label
     :markdown
-      @@@@This page takes a list of Chinese sentences, looks up words you don't know in [a dictionary](http://dict.revised.moe.edu.tw/index.html) and produces beautiful Anki cards of the type you can see on [this screenshot](/assets/images/sentences.png). The sentences can be simp/trad but the explanations on the cards will always be in traditional characters. To try it out, follow the instructions below.@@@
-  
-  <br>
+      This page takes a paragraph of Chinese text from which you can create MCDs in a very quick and efficiant manner. It then takes the list of created MCDs and adds dictionary entries to the cards.  
 
   -# FIXME This is probably not how this is supposed to be done
   #notes-label-input{style: "float:right;"}
     %h3 Notes
-    %textarea.span3#mcds-notes(rows="8" placeholder="@@@@")
+    %textarea.span3#mcds-notes(rows="8" placeholder="These Notes will appear at the top of each card.")
   %h3 Input
-  %textarea.span4#mcds-input(rows="8" placeholder="@@@@" width="100%")
-  
-
-
+  %textarea.span4#mcds-input(rows="8" placeholder="Paste your text here." width="100%")
 
   <br>
 
   #mcds-display
-    :plain
-      ...
 
   %h3 Cloze codes
   %input#mcds-code-input
 
   %h3 Raw MCDs without Dictionary Entries
-  %textarea.span7#mcds-output(rows="4")
+  %textarea.span7#mcds-output(rows="4" placeholder="The MCDs you create will appear here after you've entered its code in the text box above.")
 
   <br><br>
 
-  %a.btn.btn-primary#sc-lookup Look up sentences
+  %a.btn.btn-primary#mcds-lookup Look up Words
 
   <br><br>
 
-  %textarea.span7#sc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you click on \"Look up Words\".")
-
--##debug
-
+  %textarea.span7#mcds-dict-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you click on \"Look up Words\".")
 
