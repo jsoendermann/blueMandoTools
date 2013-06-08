@@ -148,47 +148,10 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	charSet := cedict.DetermineCharSet(sentence)
 
-	// get moe entries
-	// this array might end up being larger than len(words) if
-	// one simplified word maps to more than one traditional word
-	moeEntries := make([]moedict.Entry, len(words))
-
-	// TODO explain diff. between trad and simp
-	if charSet == chinese.Trad {
-		for i, word := range words {
-			entry, err := moedict.FindEntry(word)
-			if err != nil {
-				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
-				return
-			}
-
-			moeEntries[i] = *entry
-		}
-	}
-	// if the sentences is in simplified characters, find cedict records first
-	// (there may be multiple records per word) and find moedict records using
-	// the traditional word of the cedict records.
-	if charSet == chinese.Simp {
-		for _, word := range words {
-
-			records, err := cedict.FindRecords(word, chinese.Simp)
-			if err != nil {
-				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
-				return
-			}
-
-			for _, record := range records {
-				entry, err := moedict.FindEntry(record.Trad)
-				if err != nil {
-					fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
-					return
-				}
-
-				if entry != nil {
-					moeEntries = append(moeEntries, *entry)
-				}
-			}
-		}
+	moeEntries, err := findMoeEntriesForWords(words, charSet)
+	if err != nil {
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		return
 	}
 
 	// construct csv row
@@ -265,61 +228,10 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		}
 	}
 
-	// get moe entries
-	// this array might end up being larger than len(words) if
-	// one simplified word maps to more than one traditional word
-	moeEntries := make([]moedict.Entry, len(words))
-
-	// TODO explain diff. between trad and simp
-	if charSet == chinese.Trad {
-		for i, word := range words {
-			entry, err := moedict.FindEntry(word)
-			if err != nil {
-				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
-				return
-			}
-
-			moeEntries[i] = *entry
-		}
-	}
-
-	// if the sentences is in simplified characters, find cedict records first
-	// (there may be multiple records per word) and find moedict records using
-	// the traditional word of the cedict records.
-	if charSet == chinese.Simp {
-		for _, word := range words {
-
-			records, err := cedict.FindRecords(word, chinese.Simp)
-			if err != nil {
-				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
-				return
-			}
-
-			individualRecords := make([]cedict.Record, 0)
-			for _, r := range records {
-				recordInSlice := false
-				for _, ir := range individualRecords {
-					if r.Trad == ir.Trad {
-						recordInSlice = true
-					}
-				}
-				if !recordInSlice {
-					individualRecords = append(individualRecords, r)
-				}
-			}
-
-			for _, record := range individualRecords {
-				entry, err := moedict.FindEntry(record.Trad)
-				if err != nil {
-					fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
-					return
-				}
-
-				if entry != nil {
-					moeEntries = append(moeEntries, *entry)
-				}
-			}
-		}
+	moeEntries, err := findMoeEntriesForWords(words, charSet)
+	if err != nil {
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		return
 	}
 
 	// construct csv row
