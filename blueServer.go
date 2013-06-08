@@ -15,6 +15,7 @@ import (
 
 // This regexp is used to find words in sentences
 var findWordsInSentencesRegexp *regexp.Regexp
+var findCharInMcdsRegexp *regexp.Regexp
 
 func main() {
 	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
@@ -29,10 +30,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	findCharInMcdsRegexp, err = regexp.Compile(clozeBegin + "(.*?)" + clozeEnd)
+	if err != nil {
+		panic(err)
+	}
 
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
-  mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
+	mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
 
 	// FIXME reimplement this
 	// set active class in navbar
@@ -179,7 +184,9 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 					return
 				}
 
-				moeEntries = append(moeEntries, *entry)
+				if entry != nil {
+					moeEntries = append(moeEntries, *entry)
+				}
 			}
 		}
 	}
@@ -199,6 +206,8 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		output += "<br>"
 	}
 
+	// TODO add cedict records
+
 	// TODO turn this into a function
 
 	// use json.Marshal with an anonymous variable to escape the \t and " characters
@@ -216,5 +225,110 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
-  return
+	mcd := getLastPathComponent(request)
+	colors := getColors(request)
+
+	// get clozed char and original text
+	mcd = strings.Replace(mcd, "@SLASH@", "/", -1)
+	back := strings.Split(mcd, "\t")[1]
+	chars := findCharInMcdsRegexp.FindAllStringSubmatch(back, -1)
+	clozeChar := chars[0][1]
+	originalText := strings.Replace(back, clozeBegin+clozeChar+clozeEnd, clozeChar, -1)
+
+	splitText, err := cedict.SplitChineseTextIntoWords(originalText)
+	if err != nil {
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		return
+	}
+
+	charSet := cedict.DetermineCharSet(originalText)
+
+	words := make([]string, 0)
+	cedictRecords := make([]cedict.Record, 0)
+
+	for _, ctw := range splitText {
+		if ctw.T == cedict.WordTypeRecords {
+			if cw := ctw.R[0].WordByCharSet(charSet); strings.Index(cw, clozeChar) != -1 {
+				//fmt.Println(cw)
+				words = append(words, cw)
+				for _, r := range ctw.R {
+					cedictRecords = append(cedictRecords, r)
+				}
+			}
+		}
+	}
+
+	// get moe entries
+	// this array might end up being larger than len(words) if
+	// one simplified word maps to more than one traditional word
+	moeEntries := make([]moedict.Entry, len(words))
+
+	// TODO explain diff. between trad and simp
+	if charSet == chinese.Trad {
+		for i, word := range words {
+			entry, err := moedict.FindEntry(word)
+			if err != nil {
+				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+				return
+			}
+
+			moeEntries[i] = *entry
+		}
+	}
+
+	// if the sentences is in simplified characters, find cedict records first
+	// (there may be multiple records per word) and find moedict records using
+	// the traditional word of the cedict records.
+	if charSet == chinese.Simp {
+		for _, word := range words {
+
+			records, err := cedict.FindRecords(word, chinese.Simp)
+			if err != nil {
+				fmt.Println("2")
+				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+				return
+			}
+
+			for _, record := range records {
+				entry, err := moedict.FindEntry(record.Trad)
+				if err != nil {
+					fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+					return
+				}
+
+				if entry != nil {
+					moeEntries = append(moeEntries, *entry)
+				}
+			}
+		}
+	}
+
+	// construct csv row
+	var output string
+
+	output += mcd
+	output += "\t"
+
+	for _, moeEntry := range moeEntries {
+		output += moeEntry.ToHTML(colors)
+		output += "<br>"
+	}
+
+	// TODO add cedict records
+
+	// TODO turn this into a function
+
+	// use json.Marshal with an anonymous variable to escape the \t and " characters
+	// in the response
+	j, err := json.Marshal(map[string]interface{}{
+		"error": "nil",
+		"csv":   output,
+	})
+	if err != nil {
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		return
+	}
+
+	fmt.Fprintf(writer, string(j))
+
 }
