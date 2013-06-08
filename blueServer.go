@@ -6,7 +6,7 @@ import (
 	"github.com/hoisie/mustache"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
-	"github.com/yangchuanzhang/moedict"
+	//"github.com/yangchuanzhang/moedict"
 	"github.com/yangchuanzhang/pinyin"
 	"net/http"
 	"regexp"
@@ -38,6 +38,7 @@ func main() {
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
+  settingsHtml := mustache.RenderFileInLayout("settings.html", "layout.html")
 
 	// FIXME reimplement this
 	// set active class in navbar
@@ -52,7 +53,7 @@ func main() {
 		http.Redirect(writer, request, sentencesPath, http.StatusFound)
 	})
 
-	// /vocab/ and /sentences/ are both handled by simple, anonymous functions that
+	// /vocab/, /sentences/ and /mcds/ are both handled by simple, anonymous functions that
 	// write static html to the ResponseWriter
 	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, vocabHtml)
@@ -67,6 +68,12 @@ func main() {
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
+
+  // /settings/ and /about/ handlers
+  http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, settingsHtml)
+	})
+  // TODO /about/ handler
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
@@ -150,7 +157,7 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	moeEntries, err := findMoeEntriesForWords(words, charSet)
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 		return
 	}
 

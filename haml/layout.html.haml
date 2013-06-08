@@ -25,16 +25,18 @@
               %li#vocab-link
                 -# TODO Find a better solution for this css hack
                 %a(href="/vocab/" style="padding-left: 0;") Vocab Cards
+              %li#moe-vocab-link
+                %a{:href => "/moe-vocab/"} Moe Vocab Cards
               %li#sentences-link
                 %a{:href => "/sentences/"} Sentence Cards
               %li#mcds-link
                 %a{:href => "/mcds/"} MCDs
               %li#settings-help-link
-                %a{:href => "/settings-help/"}
-                  :plain
-                    Help & Settings
+                %a{:href => "/settings/"} Settings
               %li#about-link
-                %a{:href => "/about/"} About
+                %a{:href => "/help-about/"} 
+                  :plain
+                    Help & About
 
 
     .container
