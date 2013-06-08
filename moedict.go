@@ -4,7 +4,7 @@ TODO package description
 package moedict
 
 import (
-  "fmt"
+//  "fmt"
   "github.com/yangchuanzhang/bopomofo"
   "encoding/json"
   "io/ioutil"
@@ -67,7 +67,8 @@ func FindEntry(word string) (*Entry, error) {
   }
 
   if e.Title == "" { // Word could not be found in dict
-    return nil, fmt.Errorf("Word doesn't exist in dictionary")
+    // This shouldn't be an error
+    return nil, nil //fmt.Errorf("Word doesn't exist in dictionary")
   }
 
   return &e, nil
