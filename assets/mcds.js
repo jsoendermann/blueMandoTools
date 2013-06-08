@@ -21,7 +21,7 @@ for (var i in alphabet)
 }
 var CLOZE_BEGIN = '<span style="font-weight:600;color:#0000ff;">';
 var CLOZE_END = '</span>';
-var CLOZE_SYMBOL = CLOZE_BEGIN+'[...]'+CLOZE_END;
+var CLOZE_SYMBOL = CLOZE_BEGIN+'％'+CLOZE_END;
 
 
 // dicts

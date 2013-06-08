@@ -249,10 +249,17 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	for _, ctw := range splitText {
 		if ctw.T == cedict.WordTypeRecords {
 			if cw := ctw.R[0].WordByCharSet(charSet); strings.Index(cw, clozeChar) != -1 {
-				//fmt.Println(cw)
-				words = append(words, cw)
-				for _, r := range ctw.R {
-					cedictRecords = append(cedictRecords, r)
+				wordInArray := false
+				for _, ew := range words {
+					if ew == cw {
+						wordInArray = true
+					}
+				}
+				if !wordInArray {
+					words = append(words, cw)
+					for _, r := range ctw.R {
+						cedictRecords = append(cedictRecords, r)
+					}
 				}
 			}
 		}
@@ -284,12 +291,24 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 			records, err := cedict.FindRecords(word, chinese.Simp)
 			if err != nil {
-				fmt.Println("2")
 				fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
 				return
 			}
 
-			for _, record := range records {
+			individualRecords := make([]cedict.Record, 0)
+			for _, r := range records {
+				recordInSlice := false
+				for _, ir := range individualRecords {
+					if r.Trad == ir.Trad {
+						recordInSlice = true
+					}
+				}
+				if !recordInSlice {
+					individualRecords = append(individualRecords, r)
+				}
+			}
+
+			for _, record := range individualRecords {
 				entry, err := moedict.FindEntry(record.Trad)
 				if err != nil {
 					fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
@@ -314,7 +333,12 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		output += "<br>"
 	}
 
-	// TODO add cedict records
+	output += "\t"
+
+	for _, cr := range cedictRecords {
+		output += cr.ToHTML(colors)
+		output += "<br>"
+	}
 
 	// TODO turn this into a function
 
