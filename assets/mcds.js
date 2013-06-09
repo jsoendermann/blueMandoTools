@@ -165,11 +165,11 @@ function processCodeInputKeyup()
     // #####
 
     /*$("#mcds-notes").val($("#mcds-notes").val()+rts.length);
-    for (var i in rts.length) {
+      for (var i in rts.length) {
 
-      //var v = rts[i];
-      //$("#mcds-notes").val($("#mcds-notes").val()+v);
-      $("#mcds-notes").val($("#mcds-notes").val()+i);
+    //var v = rts[i];
+    //$("#mcds-notes").val($("#mcds-notes").val()+v);
+    $("#mcds-notes").val($("#mcds-notes").val()+i);
     }*/
   }
 
@@ -177,18 +177,22 @@ function processCodeInputKeyup()
 
 
 $(function(){
-  $("#mcds-input").keyup(function() {
-    processInput($("#mcds-input").val());
-  })
-  $("#mcds-code-input").keyup(function() {
-    processCodeInputKeyup();
-  })
-  $("#mcds-output").click(function() {
-    $("#mcds-output").focus();
-    $("#mcds-output").select();
-  })
+  if (! ($("#mcds-input").val() == undefined)) {
+    console.log("Executing mcds.js functions")
 
-  processInput($("#mcds-input").val());
+    $("#mcds-input").keyup(function() {
+      processInput($("#mcds-input").val());
+    })
+    $("#mcds-code-input").keyup(function() {
+      processCodeInputKeyup();
+    })
+    $("#mcds-output").click(function() {
+      $("#mcds-output").focus();
+      $("#mcds-output").select();
+    })
+
+    processInput($("#mcds-input").val());
+  }
 });
 
 
