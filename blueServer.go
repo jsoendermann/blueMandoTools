@@ -18,7 +18,7 @@ var findWordsInSentencesRegexp *regexp.Regexp
 var findCharInMcdsRegexp *regexp.Regexp
 
 func main() {
-	fmt.Println("Welcome to the Blue Mandarin Lab Flash Card Server.")
+	fmt.Println("### Welcome to the Blue Mandarin Lab Flash Card Server ###")
 
 	err := cedict.LoadDb()
 	if err != nil {
@@ -36,9 +36,11 @@ func main() {
 	}
 
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
+  moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", "layout.html")
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
   settingsHtml := mustache.RenderFileInLayout("settings.html", "layout.html")
+  helpAboutHtml := mustache.RenderFileInLayout("help-about.html", "layout.html")
 
 	// FIXME reimplement this
 	// set active class in navbar
@@ -50,13 +52,16 @@ func main() {
 
 	// the root is handled by an anonymous function that redirects to "/sentences/"
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, sentencesPath, http.StatusFound)
+		http.Redirect(writer, request, helpAboutPath, http.StatusFound)
 	})
 
 	// /vocab/, /sentences/ and /mcds/ are both handled by simple, anonymous functions that
 	// write static html to the ResponseWriter
 	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, vocabHtml)
+	})
+  http.HandleFunc(moeVocabPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, moeVocabHtml)
 	})
 	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, sentencesHtml)
@@ -66,14 +71,17 @@ func main() {
 	})
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
+  http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
 
-  // /settings/ and /about/ handlers
+  // /settings/ and /help-about/ handlers
   http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, settingsHtml)
 	})
-  // TODO /about/ handler
+  http.HandleFunc(helpAboutPath, func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, helpAboutHtml)
+	})
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
@@ -140,6 +148,10 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	fmt.Fprintf(writer, string(j))
+}
+
+func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
+  return //TODO
 }
 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
