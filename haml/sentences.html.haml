@@ -8,26 +8,8 @@
 
   <br><br>
 
-  %label
-    To import the generated cards to Anki, please follow these steps:
-    %ol
-      %li
-        If this is the first time you use this service, please download a sentences deck to import to 
-        = succeed '.' do
-          %a{:href => "/assets/anki-decks/Sentences.apkg"} here
-        :escaped
-          You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <sentence>\t<explanations>.
-      %li Copy the contents of the text area below to a text file and save the file (you will delete this file later).
-      %li Open your sentences deck in Anki and select File→Import.
-      %li Make sure "Allow HTML in fields" is checked and click on "Import".
-      %li The cards should now appear in your deck and you can delete the text file you created in step 2.
-
   %a.btn.btn-primary#sc-lookup Look up sentences
 
   <br><br>
 
   %textarea.span7#sc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you click on \"Look up Words\".")
-
--##debug
-
-

@@ -35,12 +35,12 @@ func main() {
 		panic(err)
 	}
 
-	vocabHtml := mustache.RenderFileInLayout("vocab.html", "layout.html")
-  moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", "layout.html")
-	sentencesHtml := mustache.RenderFileInLayout("sentences.html", "layout.html")
-	mcdsHtml := mustache.RenderFileInLayout("mcds.html", "layout.html")
-  settingsHtml := mustache.RenderFileInLayout("settings.html", "layout.html")
-  helpAboutHtml := mustache.RenderFileInLayout("help-about.html", "layout.html")
+	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile)
+  moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile)
+	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile)
+	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile)
+  settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile)
+  helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
 
 	// FIXME reimplement this
 	// set active class in navbar
