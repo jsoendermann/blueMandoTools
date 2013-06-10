@@ -35,11 +35,11 @@ func main() {
 		panic(err)
 	}
 
-	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile)
-  moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile)
-	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile)
-	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile)
-  settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile)
+	vocabHtml := mustache.RenderFileInLayout(    "vocab.html",      layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
+  moeVocabHtml := mustache.RenderFileInLayout( "moe-vocab.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
+	sentencesHtml := mustache.RenderFileInLayout("sentences.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
+	mcdsHtml := mustache.RenderFileInLayout(     "mcds.html",       layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
+  settingsHtml := mustache.RenderFileInLayout( "settings.html",   layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
   helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
 
 	// FIXME reimplement this

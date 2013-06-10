@@ -31,13 +31,13 @@ func findMoeEntriesForWords(words []string, charSet chinese.CharSet) ([]moedict.
 
 	// TODO explain diff. between trad and simp
 	if charSet == chinese.Trad {
-		for i, word := range words {
+		for _, word := range words {
 			entry, err := moedict.FindEntry(word)
 			if err != nil {
 				return nil, err
 			}
 
-			moeEntries[i] = *entry
+      moeEntries = append(moeEntries, *entry)
 		}
 	}
 
