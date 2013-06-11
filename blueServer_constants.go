@@ -22,6 +22,6 @@ const layoutFile = "layout.html"
 
 // mcd related constants
 const (
-	clozeBegin = `<span style="font-weight:600;color:#0000ff;">`
+	clozeBegin = `<span style="font-weight:600;color:#ff12c7;">`
 	clozeEnd   = `</span>`
 )

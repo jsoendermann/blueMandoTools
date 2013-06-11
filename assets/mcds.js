@@ -19,7 +19,7 @@ for (var i in alphabet)
   if (easyToReachKeys.indexOf(c) == -1)
     keysForFrequentlyUsedChars.push(c);
 }
-var CLOZE_BEGIN = '<span style="font-weight:600;color:#0000ff;">';
+var CLOZE_BEGIN = '<span style="font-weight:600;color:#ff12c7;">';
 var CLOZE_END = '</span>';
 var CLOZE_SYMBOL = CLOZE_BEGIN+'％'+CLOZE_END;
 
