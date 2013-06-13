@@ -108,6 +108,15 @@ func (e Entry) ToHTML(toneColors []string) string {
         html += example
         html += "<br>"
       }
+      
+      // quotes
+      for _,quote := range definition.Quote {
+        nonEmptyDefinition = true
+
+        html += `<span style="color:#BBBBBB;">`
+        html += quote
+        html += "</span><br>"
+      }
       if nonEmptyDefinition {
         html += "<br>"
       }
