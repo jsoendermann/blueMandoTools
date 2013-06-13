@@ -6,7 +6,7 @@ import (
 	"github.com/hoisie/mustache"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
-	//"github.com/yangchuanzhang/moedict"
+	"github.com/yangchuanzhang/moedict"
 	"github.com/yangchuanzhang/pinyin"
 	"net/http"
 	"regexp"
@@ -35,6 +35,7 @@ func main() {
 		panic(err)
 	}
 
+  // Load html files, the array at the end contains the js files to be loaded
 	vocabHtml := mustache.RenderFileInLayout(    "vocab.html",      layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
   moeVocabHtml := mustache.RenderFileInLayout( "moe-vocab.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
@@ -151,7 +152,45 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
-  return //TODO
+  word := getLastPathComponent(request)
+	colors := getColors(request)
+
+  // convert to trad
+  tradWord, err := cedict.Simp2Trad(word)
+  if err != nil {
+    fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		return
+	}
+
+  moeEntry, err := moedict.FindEntry(tradWord)
+  if moeEntry == nil {
+		fmt.Fprintf(writer, `{"error": "No matches found", "word": "`+word+`"}`)
+		return
+	}
+  if err != nil {
+    fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		return
+	}
+
+	// construct csv row
+	var output string
+
+	output += tradWord
+	output += "\t"
+  output += moeEntry.ToHTML(colors)
+
+	// use json.Marshal with an anonymous variable to escape the \t and " characters
+	// in the response
+	j, err := json.Marshal(map[string]interface{}{
+		"error": "nil",
+		"csv":   output,
+	})
+	if err != nil {
+		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		return
+	}
+
+	fmt.Fprintf(writer, string(j))
 }
 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
