@@ -123,15 +123,17 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
   // this string has the same number of characters as the word.
   // in places where the simplified and the traditional characters
   // are the same, it has a space, otherwise it has the simplified character
-  // TODO make this go the other way too for people who prefer simplified
   simpChars := ""
+  tradChars := ""
   for is,cs := range records[0].Simp {
     for it,ct := range records[0].Trad {
       if is == it {
         if cs == ct {
           simpChars += string('\u3000')
+          tradChars += string('\u3000')
         } else {
           simpChars += string(cs)
+          tradChars += string(ct)
         }
       }
     }
@@ -141,12 +143,16 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	// construct csv row
 	var output string
 
-	output += records[0].Trad
+  output += records[0].Trad
 	output += "\t"
+  output += records[0].Simp
+  output += "\t"
   // This dot is necessary because Anki trims whitespace when importing.
   // For more details, see the card layout of the shengci deck
-	output += "."+simpChars
+	output += "."+tradChars
 	output += "\t"
+  output += "."+simpChars
+  output += "\t"
 
 	for _, record := range records {
 		output += pinyin.Num2DiaCol(record.Pinyin, colors, "&nbsp;")
