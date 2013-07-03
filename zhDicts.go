@@ -9,7 +9,7 @@ import (
 var db *sql.DB
 
 func LoadDb() error {
-    dbPath := os.Getenv("ZHDICT_DB")
+    dbPath := os.Getenv("ZHDICTS_DB")
 
     var err error
     db, err = sql.Open("sqlite3", dbPath)
@@ -24,6 +24,6 @@ func CloseDb() {
     db.Close()
 }
 
-func getDb() *sql.DB {
+func Db() *sql.DB {
     return db
 }
