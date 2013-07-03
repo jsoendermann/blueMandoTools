@@ -4,12 +4,11 @@ TODO: add package description
 package cedict
 
 import (
-  "database/sql"
   _ "github.com/mattn/go-sqlite3"
   "fmt"
   "github.com/yangchuanzhang/chinese"
-  "os"
   "github.com/yangchuanzhang/pinyin"
+  "github.com/yangchuanzhang/zhDicts"
 )
 
 type Record struct {
@@ -22,8 +21,7 @@ type Record struct {
 func (r Record) WordByCharSet(c chinese.CharSet) string {
   if c == chinese.Trad {
     return r.Trad
-  } 
-  // else
+  }
   return r.Simp
 }
 
@@ -45,31 +43,16 @@ func (r Record) ToHTML(toneColors []string) string {
   return html
 }
 
-var db *sql.DB
-var dbLoaded = false
 var maxRunecount int
 
-// LoadDb opens the database file. It's not necessary to call this function
-// explicitly, as all functions that access the db open and close it themselves,
-// if the database is not open, but it can improve performance by avoiding constant
-// calls to sql.Open and Close.
-func LoadDb() (err error) {
-  if !dbLoaded {
-    // get db filepath from environment variable CEDICT_DB
-    // or assume it's in the current directory
-    dbPath := os.Getenv("CEDICT_DB")
-    if dbPath == "" {
-      dbPath = "/Users/json/cedict.sqlite3"
-    }
-
-    // attempt to load database
-    db, err = sql.Open("sqlite3", dbPath)
-    if err == nil {
-      dbLoaded = true
+func Initialize() error {
+    db := zhDicts.Db()
+    if db == nil {
+        return fmt.Errorf("Database not loaded")
     }
 
     // get max runecount
-    sqlMaxRunecount := "SELECT MAX(runecount) AS maxRunecount FROM dict"
+    sqlMaxRunecount := "SELECT MAX(runecount) AS maxRunecount FROM cedict"
 
     rows, err := db.Query(sqlMaxRunecount)
     if err != nil {
@@ -79,27 +62,17 @@ func LoadDb() (err error) {
 
     rows.Next()
     rows.Scan(&maxRunecount)
-  }
-  return
+
+    return nil
 }
 
-// CloseDb closes the database connection if it's open. Otherwise, it does nothing.
-func CloseDb() {
-  if dbLoaded {
-    db.Close()
-    dbLoaded = false
-  }
-}
 
-func isDbLoaded() bool {
-  return dbLoaded
-}
 
 // FindRecords searches the database of cedict records and returns a slice of type
 // []Record and an error. It returns an empty slice if no matches could be found.
 func FindRecords(word string, charSet chinese.CharSet) ([]Record, error) {
   // construct db query based on charSet
-  sql := "SELECT * FROM dict "
+  sql := "SELECT * FROM cedict "
 
   switch charSet {
     case chinese.Trad: 
@@ -111,7 +84,7 @@ func FindRecords(word string, charSet chinese.CharSet) ([]Record, error) {
   }
 
   // execute the query and defer closing it
-  rows, err := db.Query(sql)
+  rows, err := zhDicts.Db().Query(sql)
   if err != nil {
     return nil, err
   }
