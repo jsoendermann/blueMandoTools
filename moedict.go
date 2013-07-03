@@ -35,7 +35,7 @@ type Definition struct {
 	Quote    []string
 	Example  []string
 	DefType  string `json:"type"` // this field is called "type" in the output of the server
-	Link     []string //FIXME this is a list, not a string
+	Link     []string
 	Synonyms string
 	Antonyms string
 }
@@ -57,7 +57,7 @@ func FindEntry(word string) (*Entry, error) {
 	}
 
 	// unmarshal json into e
-	var e Entry
+	var e Entry`
 
 	jsonErr := json.Unmarshal(body, &e)
 	if jsonErr != nil {
