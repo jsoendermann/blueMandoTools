@@ -57,7 +57,7 @@ func FindEntry(word string) (*Entry, error) {
 	}
 
 	// unmarshal json into e
-	var e Entry`
+	var e Entry
 
 	jsonErr := json.Unmarshal(body, &e)
 	if jsonErr != nil {
