@@ -36,7 +36,7 @@ type Definition struct {
   Quote   []string
   Example []string
   //	DefType  string `json:"type"` // this field is called "type" in the output of the server
-  //	Link     string
+  //	Link     string //FIXME this is a list, not a string
   Synonyms string
   Antonyms string
 }
