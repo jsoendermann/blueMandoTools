@@ -4,10 +4,10 @@ TODO package description
 package moedict
 
 import (
-	"encoding/json"
+	"fmt"
+        "strings"
 	"github.com/yangchuanzhang/bopomofo"
-	"io/ioutil"
-	"net/http"
+	"github.com/yangchuanzhang/zhDicts"
 )
 
 // These three structs reflect the json of the api at https://www.moedict.tw/uni/
@@ -40,36 +40,93 @@ type Definition struct {
 	Antonyms string
 }
 
-// FindEntry queries http://www.moedict.tw/uni/ and loads the data into a variable of type Entry
-// a pointer to which it returns. This method blocks during the http request.
+// TODO implement Stringer interface for Entry
+
 func FindEntry(word string) (*Entry, error) {
-	// make http request, check for errors and defer close
-	resp, err := http.Get("http://www.moedict.tw/uni/" + word)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// read data into variable
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	// unmarshal json into e
+        fmt.Println("hello")
 	var e Entry
+	db := zhDicts.Db()
 
-	jsonErr := json.Unmarshal(body, &e)
-	if jsonErr != nil {
-		return nil, jsonErr
+	// Find Entry
+	eRow, err := db.Query("SELECT * FROM md_entries WHERE title = '" + word + "'")
+	if err != nil {
+		return nil, err
+	}
+	defer eRow.Close()
+
+	var entry_id int
+	if eRow.Next() {
+		eRow.Scan(&entry_id, &e.Title, &e.Radical, &e.Stroke_count, &e.Non_radical_stroke_count)
+	} else {
+		return nil, nil
 	}
 
-	if e.Title == "" { // Word could not be found in dict
-		// This shouldn't be an error
-		return nil, nil //fmt.Errorf("Word doesn't exist in dictionary")
+	e.Heteronyms, err = findHeteronyms(entry_id)
+	if err != nil {
+		return nil, err
 	}
 
 	return &e, nil
+}
+
+func findHeteronyms(entry_id int) ([]Heteronym, error) {
+        db := zhDicts.Db()
+	hs := make([]Heteronym, 0)
+
+	// Find heteronyms
+	hRows, err := db.Query(fmt.Sprintf("SELECT id, pinyin, bopomofo, bopomofo2 FROM md_heteronyms WHERE entry_id = %d ORDER BY idx", entry_id))
+	if err != nil {
+		return nil, err
+	}
+	defer hRows.Close()
+
+	for hRows.Next() {
+		var h Heteronym
+		var heteronym_id int
+
+		hRows.Scan(&heteronym_id, &h.Pinyin, &h.Bopomofo, &h.Bopomofo2)
+
+		h.Definitions, err = findDefinitions(heteronym_id)
+		if err != nil {
+			return nil, err
+		}
+
+		hs = append(hs, h)
+	}
+	return hs, nil
+}
+
+func findDefinitions(heteronym_id int) ([]Definition, error) {
+        db := zhDicts.Db()
+	ds := make([]Definition, 0)
+
+	dRows, err := db.Query(fmt.Sprintf("SELECT def, quotes, examples, type, link, synonyms, antonyms FROM md_definitions WHERE heteronym_id = %d ORDER BY idx", heteronym_id))
+	if err != nil {
+		return nil, err
+	}
+	defer dRows.Close()
+
+	for dRows.Next() {
+		var d Definition
+
+		quotes := ""
+		examples := ""
+		links := ""
+
+		dRows.Scan(&d.Def, &quotes, &examples, &d.DefType, &links, &d.Synonyms, &d.Antonyms)
+
+		d.Quote = strings.Split(quotes, "|||")
+		d.Example = strings.Split(examples, "|||")
+		d.Link = strings.Split(links, "|||")
+
+		ds = append(ds, d)
+	}
+
+	return ds, nil
+}
+
+func Initialize() error {
+	return nil
 }
 
 // Implement chinese.ToHTMLer
