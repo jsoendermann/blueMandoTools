@@ -43,7 +43,6 @@ type Definition struct {
 // TODO implement Stringer interface for Entry
 
 func FindEntry(word string) (*Entry, error) {
-        fmt.Println("hello")
 	var e Entry
 	db := zhDicts.Db()
 
