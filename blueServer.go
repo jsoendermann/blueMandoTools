@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hoisie/mustache"
+        "github.com/yangchuanzhang/zhDicts"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
 	"github.com/yangchuanzhang/moedict"
@@ -20,11 +21,20 @@ var findCharInMcdsRegexp *regexp.Regexp
 func main() {
 	fmt.Println("### Welcome to the Blue Mandarin Lab Flash Card Server ###")
 
-	err := cedict.LoadDb()
+	err := zhDicts.LoadDb()
 	if err != nil {
 		panic(err)
 	}
-	defer cedict.CloseDb()
+	defer zhDicts.CloseDb()
+
+        err = cedict.Initialize()
+        if err != nil {
+            panic(err)
+        }
+        err = moedict.Initialize()
+        if err != nil {
+            panic(err)
+        }
 
 	findWordsInSentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
 	if err != nil {
