@@ -8,6 +8,7 @@ import (
         "strings"
 	"github.com/yangchuanzhang/bopomofo"
 	"github.com/yangchuanzhang/zhDicts"
+        "database/sql"
 )
 
 // These three structs reflect the json of the api at https://www.moedict.tw/uni/
@@ -55,7 +56,14 @@ func FindEntry(word string) (*Entry, error) {
 
 	var entry_id int
 	if eRow.Next() {
-		eRow.Scan(&entry_id, &e.Title, &e.Radical, &e.Stroke_count, &e.Non_radical_stroke_count)
+                var radical sql.NullString
+		eRow.Scan(&entry_id, &e.Title, &radical, &e.Stroke_count, &e.Non_radical_stroke_count)
+
+                if radical.Valid {
+                    e.Radical = radical.String
+                } else {
+                    e.Radical = ""
+                }
 	} else {
 		return nil, nil
 	}
@@ -83,7 +91,27 @@ func findHeteronyms(entry_id int) ([]Heteronym, error) {
 		var h Heteronym
 		var heteronym_id int
 
-		hRows.Scan(&heteronym_id, &h.Pinyin, &h.Bopomofo, &h.Bopomofo2)
+                var pinyin, bopomofo, bopomofo2 sql.NullString
+
+		hRows.Scan(&heteronym_id, &pinyin, &bopomofo, &bopomofo2)
+
+                if pinyin.Valid {
+                    h.Pinyin = pinyin.String
+                } else {
+                    h.Pinyin = ""
+                }
+                
+                if bopomofo.Valid {
+                    h.Bopomofo = bopomofo.String
+                } else {
+                    h.Bopomofo = ""
+                }
+
+                if bopomofo2.Valid {
+                    h.Bopomofo2 = bopomofo2.String
+                } else {
+                    h.Bopomofo2 = ""
+                }
 
 		h.Definitions, err = findDefinitions(heteronym_id)
 		if err != nil {
@@ -108,15 +136,52 @@ func findDefinitions(heteronym_id int) ([]Definition, error) {
 	for dRows.Next() {
 		var d Definition
 
-		quotes := ""
-		examples := ""
-		links := ""
+		var def, quotes, examples, defType, links, synonyms, antonyms sql.NullString
 
-		dRows.Scan(&d.Def, &quotes, &examples, &d.DefType, &links, &d.Synonyms, &d.Antonyms)
+		dRows.Scan(&def, &quotes, &examples, &defType, &links, &synonyms, &antonyms)
 
-		d.Quote = strings.Split(quotes, "|||")
-		d.Example = strings.Split(examples, "|||")
-		d.Link = strings.Split(links, "|||")
+                if def.Valid {
+                    d.Def = def.String
+                } else {
+                    d.Def = ""
+                }
+                if quotes.Valid {
+                    d.Quote = strings.Split(quotes.String, "|||")
+                } else {
+                    d.Quote = make([]string, 0)
+
+                }
+                if examples.Valid {
+                    d.Example = strings.Split(examples.String, "|||")
+                } else {
+                    d.Example = make([]string, 0)
+                }
+
+                if defType.Valid {
+                    d.DefType = defType.String
+                } else {
+                    d.DefType = ""
+                }
+
+                if links.Valid {
+                    d.Link = strings.Split(links.String, "|||")
+                } else {
+                    d.Link = make([]string, 0)
+                }
+
+                 if synonyms.Valid {
+                    d.Synonyms = synonyms.String
+                } else {
+                    d.Synonyms = ""
+                }
+
+                 if antonyms.Valid {
+                    d.Antonyms = antonyms.String
+                } else {
+                    d.Antonyms = ""
+                }
+
+
 
 		ds = append(ds, d)
 	}
