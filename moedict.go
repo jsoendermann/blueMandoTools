@@ -195,7 +195,7 @@ func (e Entry) ToHTML(toneColors []string) string {
 
 	for _, heteronym := range e.Heteronyms {
 		// title nice and large
-		html += `<span style="font-family: Arial; font-size: 42px; color: #000000; white-space: pre-wrap;">` + e.Title + `</span>`
+		html += `<span style="font-family: Arial; font-size:150%; color: #000000; white-space: pre-wrap;">` + e.Title + `</span>`
 
 		html += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 
