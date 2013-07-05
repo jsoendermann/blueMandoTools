@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hoisie/mustache"
-        "github.com/yangchuanzhang/zhDicts"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
 	"github.com/yangchuanzhang/moedict"
 	"github.com/yangchuanzhang/pinyin"
+	"github.com/yangchuanzhang/zhDicts"
 	"net/http"
 	"regexp"
 	"strings"
@@ -27,14 +27,14 @@ func main() {
 	}
 	defer zhDicts.CloseDb()
 
-        err = cedict.Initialize()
-        if err != nil {
-            panic(err)
-        }
-        err = moedict.Initialize()
-        if err != nil {
-            panic(err)
-        }
+	err = cedict.Initialize()
+	if err != nil {
+		panic(err)
+	}
+	err = moedict.Initialize()
+	if err != nil {
+		panic(err)
+	}
 
 	findWordsInSentencesRegexp, err = regexp.Compile("\\[(.*?)\\]")
 	if err != nil {
@@ -45,13 +45,13 @@ func main() {
 		panic(err)
 	}
 
-  // Load html files, the array at the end contains the js files to be loaded
-	vocabHtml := mustache.RenderFileInLayout(    "vocab.html",      layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
-  moeVocabHtml := mustache.RenderFileInLayout( "moe-vocab.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
-	sentencesHtml := mustache.RenderFileInLayout("sentences.html",  layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
-	mcdsHtml := mustache.RenderFileInLayout(     "mcds.html",       layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
-  settingsHtml := mustache.RenderFileInLayout( "settings.html",   layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
-  helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
+	// Load html files, the array at the end contains the js files to be loaded
+	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
+	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
+	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
+	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
+	settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
+	helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
 
 	// FIXME reimplement this
 	// set active class in navbar
@@ -71,7 +71,7 @@ func main() {
 	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, vocabHtml)
 	})
-  http.HandleFunc(moeVocabPath, func(writer http.ResponseWriter, request *http.Request) {
+	http.HandleFunc(moeVocabPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, moeVocabHtml)
 	})
 	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
@@ -82,15 +82,15 @@ func main() {
 	})
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
-  http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
+	http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
 
-  // /settings/ and /help-about/ handlers
-  http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
+	// /settings/ and /help-about/ handlers
+	http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, settingsHtml)
 	})
-  http.HandleFunc(helpAboutPath, func(writer http.ResponseWriter, request *http.Request) {
+	http.HandleFunc(helpAboutPath, func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprint(writer, helpAboutHtml)
 	})
 
@@ -130,39 +130,38 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-  // this string has the same number of characters as the word.
-  // in places where the simplified and the traditional characters
-  // are the same, it has a space, otherwise it has the simplified character
-  simpChars := ""
-  tradChars := ""
-  for is,cs := range records[0].Simp {
-    for it,ct := range records[0].Trad {
-      if is == it {
-        if cs == ct {
-          simpChars += string('\u3000')
-          tradChars += string('\u3000')
-        } else {
-          simpChars += string(cs)
-          tradChars += string(ct)
-        }
-      }
-    }
-  }
-
+	// this string has the same number of characters as the word.
+	// in places where the simplified and the traditional characters
+	// are the same, it has a space, otherwise it has the simplified character
+	simpChars := ""
+	tradChars := ""
+	for is, cs := range records[0].Simp {
+		for it, ct := range records[0].Trad {
+			if is == it {
+				if cs == ct {
+					simpChars += string('\u3000')
+					tradChars += string('\u3000')
+				} else {
+					simpChars += string(cs)
+					tradChars += string(ct)
+				}
+			}
+		}
+	}
 
 	// construct csv row
 	var output string
 
-  output += records[0].Trad
+	output += records[0].Trad
 	output += "\t"
-  output += records[0].Simp
-  output += "\t"
-  // This dot is necessary because Anki trims whitespace when importing.
-  // For more details, see the card layout of the shengci deck
-	output += "."+tradChars
+	output += records[0].Simp
 	output += "\t"
-  output += "."+simpChars
-  output += "\t"
+	// This dot is necessary because Anki trims whitespace when importing.
+	// For more details, see the card layout of the shengci deck
+	output += "." + tradChars
+	output += "\t"
+	output += "." + simpChars
+	output += "\t"
 
 	for _, record := range records {
 		output += pinyin.Num2DiaCol(record.Pinyin, colors, "&nbsp;")
@@ -188,23 +187,23 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
-  word := getLastPathComponent(request)
+	word := getLastPathComponent(request)
 	colors := getColors(request)
 
-  // convert to trad
-  tradWord, err := cedict.Simp2Trad(word)
-  if err != nil {
-    fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+	// convert to trad
+	tradWord, err := cedict.Simp2Trad(word)
+	if err != nil {
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
-  moeEntry, err := moedict.FindEntry(tradWord)
-  if moeEntry == nil {
+	moeEntry, err := moedict.FindEntry(tradWord)
+	if moeEntry == nil {
 		fmt.Fprint(writer, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
 	}
-  if err != nil {
-    fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+	if err != nil {
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
@@ -213,7 +212,7 @@ func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	output += tradWord
 	output += "\t"
-  output += moeEntry.ToHTML(colors)
+	output += moeEntry.ToHTML(colors)
 
 	// use json.Marshal with an anonymous variable to escape the \t and " characters
 	// in the response
