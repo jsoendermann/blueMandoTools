@@ -4,11 +4,11 @@ TODO package description
 package moedict
 
 import (
+	"database/sql"
 	"fmt"
-        "strings"
 	"github.com/yangchuanzhang/bopomofo"
 	"github.com/yangchuanzhang/zhDicts"
-        "database/sql"
+	"strings"
 )
 
 // These three structs reflect the json of the api at https://www.moedict.tw/uni/
@@ -41,8 +41,6 @@ type Definition struct {
 	Antonyms string
 }
 
-// TODO implement Stringer interface for Entry
-
 func FindEntry(word string) (*Entry, error) {
 	var e Entry
 	db := zhDicts.Db()
@@ -56,14 +54,14 @@ func FindEntry(word string) (*Entry, error) {
 
 	var entry_id int
 	if eRow.Next() {
-                var radical sql.NullString
+		var radical sql.NullString
 		eRow.Scan(&entry_id, &e.Title, &radical, &e.Stroke_count, &e.Non_radical_stroke_count)
 
-                if radical.Valid {
-                    e.Radical = radical.String
-                } else {
-                    e.Radical = ""
-                }
+		if radical.Valid {
+			e.Radical = radical.String
+		} else {
+			e.Radical = ""
+		}
 	} else {
 		return nil, nil
 	}
@@ -77,7 +75,7 @@ func FindEntry(word string) (*Entry, error) {
 }
 
 func findHeteronyms(entry_id int) ([]Heteronym, error) {
-        db := zhDicts.Db()
+	db := zhDicts.Db()
 	hs := make([]Heteronym, 0)
 
 	// Find heteronyms
@@ -91,27 +89,27 @@ func findHeteronyms(entry_id int) ([]Heteronym, error) {
 		var h Heteronym
 		var heteronym_id int
 
-                var pinyin, bopomofo, bopomofo2 sql.NullString
+		var pinyin, bopomofo, bopomofo2 sql.NullString
 
 		hRows.Scan(&heteronym_id, &pinyin, &bopomofo, &bopomofo2)
 
-                if pinyin.Valid {
-                    h.Pinyin = pinyin.String
-                } else {
-                    h.Pinyin = ""
-                }
-                
-                if bopomofo.Valid {
-                    h.Bopomofo = bopomofo.String
-                } else {
-                    h.Bopomofo = ""
-                }
+		if pinyin.Valid {
+			h.Pinyin = pinyin.String
+		} else {
+			h.Pinyin = ""
+		}
 
-                if bopomofo2.Valid {
-                    h.Bopomofo2 = bopomofo2.String
-                } else {
-                    h.Bopomofo2 = ""
-                }
+		if bopomofo.Valid {
+			h.Bopomofo = bopomofo.String
+		} else {
+			h.Bopomofo = ""
+		}
+
+		if bopomofo2.Valid {
+			h.Bopomofo2 = bopomofo2.String
+		} else {
+			h.Bopomofo2 = ""
+		}
 
 		h.Definitions, err = findDefinitions(heteronym_id)
 		if err != nil {
@@ -124,7 +122,7 @@ func findHeteronyms(entry_id int) ([]Heteronym, error) {
 }
 
 func findDefinitions(heteronym_id int) ([]Definition, error) {
-        db := zhDicts.Db()
+	db := zhDicts.Db()
 	ds := make([]Definition, 0)
 
 	dRows, err := db.Query(fmt.Sprintf("SELECT def, quotes, examples, type, link, synonyms, antonyms FROM md_definitions WHERE heteronym_id = %d ORDER BY idx", heteronym_id))
@@ -140,48 +138,46 @@ func findDefinitions(heteronym_id int) ([]Definition, error) {
 
 		dRows.Scan(&def, &quotes, &examples, &defType, &links, &synonyms, &antonyms)
 
-                if def.Valid {
-                    d.Def = def.String
-                } else {
-                    d.Def = ""
-                }
-                if quotes.Valid {
-                    d.Quote = strings.Split(quotes.String, "|||")
-                } else {
-                    d.Quote = make([]string, 0)
+		if def.Valid {
+			d.Def = def.String
+		} else {
+			d.Def = ""
+		}
+		if quotes.Valid {
+			d.Quote = strings.Split(quotes.String, "|||")
+		} else {
+			d.Quote = make([]string, 0)
 
-                }
-                if examples.Valid {
-                    d.Example = strings.Split(examples.String, "|||")
-                } else {
-                    d.Example = make([]string, 0)
-                }
+		}
+		if examples.Valid {
+			d.Example = strings.Split(examples.String, "|||")
+		} else {
+			d.Example = make([]string, 0)
+		}
 
-                if defType.Valid {
-                    d.DefType = defType.String
-                } else {
-                    d.DefType = ""
-                }
+		if defType.Valid {
+			d.DefType = defType.String
+		} else {
+			d.DefType = ""
+		}
 
-                if links.Valid {
-                    d.Link = strings.Split(links.String, "|||")
-                } else {
-                    d.Link = make([]string, 0)
-                }
+		if links.Valid {
+			d.Link = strings.Split(links.String, "|||")
+		} else {
+			d.Link = make([]string, 0)
+		}
 
-                 if synonyms.Valid {
-                    d.Synonyms = synonyms.String
-                } else {
-                    d.Synonyms = ""
-                }
+		if synonyms.Valid {
+			d.Synonyms = synonyms.String
+		} else {
+			d.Synonyms = ""
+		}
 
-                 if antonyms.Valid {
-                    d.Antonyms = antonyms.String
-                } else {
-                    d.Antonyms = ""
-                }
-
-
+		if antonyms.Valid {
+			d.Antonyms = antonyms.String
+		} else {
+			d.Antonyms = ""
+		}
 
 		ds = append(ds, d)
 	}
@@ -210,11 +206,27 @@ func (e Entry) ToHTML(toneColors []string) string {
 
 		// definitions
 		for _, definition := range heteronym.Definitions {
+			// antonyms & synonyms
+			if definition.Antonyms != "" {
+				html += `<span style="color:#BBBBBB;"><span style="float:right;">`
+				html += definition.Antonyms
+				html += `&nbsp;<span style="background-color:#A07070; color:white;border-radius:5px;padding:2px;font-size:85%;">反</span></span>`
+			}
+			if definition.Synonyms != "" {
+				html += `<span style="background-color:#70A070; color:white;border-radius:5px;padding:2px;font-size:85%;">似</span>&nbsp;`
+				html += definition.Synonyms
+				html += `<br /></span>`
+			} else {
+				if definition.Antonyms != "" {
+					html += "<br />"
+				}
+			}
+
 			nonEmptyDefinition := false
 			if definition.Def != "" {
 				nonEmptyDefinition = true
 
-				html += "•"
+				html += "♦"
 				html += definition.Def
 				html += "<br>"
 			}
@@ -240,9 +252,6 @@ func (e Entry) ToHTML(toneColors []string) string {
 				html += "<br>"
 			}
 		}
-
-		// TODO Add more fields to html output
 	}
-
 	return html
 }
