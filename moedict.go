@@ -209,12 +209,12 @@ func (e Entry) ToHTML(toneColors []string) string {
 			// antonyms & synonyms
 			if definition.Antonyms != "" {
                                 html += `<span style="float:right;"><span style="color:#CCBBBB;">`
-                                html += strings.Replace(definition.Antonyms, ",", "&nbsp;&nbsp;", -1)
+                                html += strings.Replace(definition.Antonyms, ",", "&nbsp; ", -1)
 				html += `&nbsp;<span style="background-color:#A07070; color:white;border-radius:5px;padding:2px;font-size:75%;">反</span></span></span>`
 			}
 			if definition.Synonyms != "" {
 				html += `<span style="color:#BBCCBB;"><span style="background-color:#70A070; color:white;border-radius:5px;padding:2px;font-size:75%;">似</span>&nbsp;`
-				html += strings.Replace(definition.Synonyms, ",", "&nbsp;&nbsp;", -1)
+				html += strings.Replace(definition.Synonyms, ",", "&nbsp; ", -1)
 				html += `</span><br />`
 			} else {
 				if definition.Antonyms != "" {
