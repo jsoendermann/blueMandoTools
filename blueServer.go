@@ -69,16 +69,16 @@ func main() {
 	// /vocab/, /sentences/ and /mcds/ are both handled by simple, anonymous functions that
 	// write static html to the ResponseWriter
 	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, vocabHtml)
+		fmt.Fprint(writer, vocabHtml)
 	})
   http.HandleFunc(moeVocabPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, moeVocabHtml)
+		fmt.Fprint(writer, moeVocabHtml)
 	})
 	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, sentencesHtml)
+		fmt.Fprint(writer, sentencesHtml)
 	})
 	http.HandleFunc(mcdsPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, mcdsHtml)
+		fmt.Fprint(writer, mcdsHtml)
 	})
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
@@ -88,10 +88,10 @@ func main() {
 
   // /settings/ and /help-about/ handlers
   http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, settingsHtml)
+		fmt.Fprint(writer, settingsHtml)
 	})
   http.HandleFunc(helpAboutPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, helpAboutHtml)
+		fmt.Fprint(writer, helpAboutHtml)
 	})
 
 	// assets file server
@@ -113,20 +113,20 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	// and send errors back to client if any occur
 	records, err := cedict.FindRecords(word, chinese.Simp)
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 	if len(records) == 0 {
 		records, err = cedict.FindRecords(word, chinese.Trad)
 		if err != nil {
-			fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+			fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 			return
 		}
 
 	}
 
 	if len(records) == 0 {
-		fmt.Fprintf(writer, `{"error": "No matches found", "word": "`+word+`"}`)
+		fmt.Fprint(writer, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
 	}
 
@@ -180,11 +180,11 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
-	fmt.Fprintf(writer, string(j))
+	fmt.Fprint(writer, string(j))
 }
 
 func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
@@ -194,17 +194,17 @@ func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
   // convert to trad
   tradWord, err := cedict.Simp2Trad(word)
   if err != nil {
-    fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+    fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
   moeEntry, err := moedict.FindEntry(tradWord)
   if moeEntry == nil {
-		fmt.Fprintf(writer, `{"error": "No matches found", "word": "`+word+`"}`)
+		fmt.Fprint(writer, `{"error": "No matches found", "word": "`+word+`"}`)
 		return
 	}
   if err != nil {
-    fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+    fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
@@ -222,11 +222,11 @@ func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "word": "`+word+`"}`)
 		return
 	}
 
-	fmt.Fprintf(writer, string(j))
+	fmt.Fprint(writer, string(j))
 }
 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
@@ -244,7 +244,7 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	moeEntries, err := findMoeEntriesForWords(words, charSet)
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 		return
 	}
 
@@ -274,11 +274,11 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
 		return
 	}
 
-	fmt.Fprintf(writer, string(j))
+	fmt.Fprint(writer, string(j))
 }
 
 func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
@@ -294,7 +294,7 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	splitText, err := cedict.SplitChineseTextIntoWords(originalText)
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
 		return
 	}
 
@@ -324,7 +324,7 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	moeEntries, err := findMoeEntriesForWords(words, charSet)
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
 		return
 	}
 
@@ -355,10 +355,10 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		"csv":   output,
 	})
 	if err != nil {
-		fmt.Fprintf(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
 		return
 	}
 
-	fmt.Fprintf(writer, string(j))
+	fmt.Fprint(writer, string(j))
 
 }
