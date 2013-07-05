@@ -195,7 +195,7 @@ func (e Entry) ToHTML(toneColors []string) string {
 
 	for _, heteronym := range e.Heteronyms {
 		// title nice and large
-		html += `<span style="font-family: Arial; font-size: 48px; color: #000000; white-space: pre-wrap;">` + e.Title + `</span>`
+		html += `<span style="font-family: Arial; font-size: 42px; color: #000000; white-space: pre-wrap;">` + e.Title + `</span>`
 
 		html += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 
@@ -206,33 +206,27 @@ func (e Entry) ToHTML(toneColors []string) string {
 
 		// definitions
 		for _, definition := range heteronym.Definitions {
-                        if definition.Antonyms != "" || definition.Synonyms != "" {
-                            html += `<span style="color:#BBBBBB;">`
-                        }
 			// antonyms & synonyms
 			if definition.Antonyms != "" {
-				html += `<span style="float:right;">`
-                                html += strings.Replace(definition.Antonyms, ",", "&nbsp;", -1)
-				html += `&nbsp;<span style="background-color:#A07070; color:white;border-radius:5px;padding:2px;font-size:75%;">反</span></span>`
+                                html += `<span style="float:right;"><span style="color:#CCBBBB;">`
+                                html += strings.Replace(definition.Antonyms, ",", "&nbsp;&nbsp;", -1)
+				html += `&nbsp;<span style="background-color:#A07070; color:white;border-radius:5px;padding:2px;font-size:75%;">反</span></span></span>`
 			}
 			if definition.Synonyms != "" {
-				html += `<span style="background-color:#70A070; color:white;border-radius:5px;padding:2px;font-size:75%;">似</span>&nbsp;`
-				html += strings.Replace(definition.Synonyms, ",", "&nbsp;", -1)
-				html += `<br />`
+				html += `<span style="color:#BBCCBB;"><span style="background-color:#70A070; color:white;border-radius:5px;padding:2px;font-size:75%;">似</span>&nbsp;`
+				html += strings.Replace(definition.Synonyms, ",", "&nbsp;&nbsp;", -1)
+				html += `</span><br />`
 			} else {
 				if definition.Antonyms != "" {
 					html += "<br />"
 				}
 			}
-                        if definition.Antonyms != "" || definition.Synonyms != "" {
-                            html += `</span>`
-                        }
 
 			nonEmptyDefinition := false
 			if definition.Def != "" {
 				nonEmptyDefinition = true
 
-				html += "♦"
+                                html += `<span style="font-size:65%;">♦&nbsp;</span>`
 				html += definition.Def
 				html += "<br>"
 			}
