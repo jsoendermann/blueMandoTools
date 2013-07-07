@@ -246,6 +246,10 @@ func (e Entry) ToHTML(toneColors []string) string {
 			// examples
 			for _, example := range definition.Example {
 				nonEmptyDefinition = true
+                                
+                                if strings.HasPrefix(example, "如：") {
+                                    example = string([]rune(example)[2:])
+                                }
 
 				html += `<span style="color:#970000;">例</span>: `
 				html += example
