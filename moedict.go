@@ -208,25 +208,25 @@ func (e Entry) ToHTML(toneColors []string) string {
 		for _, definition := range heteronym.Definitions {
 			// antonyms & synonyms
 			if definition.Antonyms != "" {
-                                html += `<span style="float:right;"><span style="color:#CCBBBB;">`
-                                antonymSlice := strings.Split(definition.Antonyms, ",")
-                                for i, a := range antonymSlice {
-                                    html += `<span style="white-space:nowrap;">`+a+"</span>"
-                                    if i < len(antonymSlice) - 1 {
-                                        html += "  "
-                                    }
-                                }
+				html += `<span style="float:right;text-align:right"><span style="color:#CCBBBB;">`
+				antonymSlice := strings.Split(definition.Antonyms, ",")
+				for i, a := range antonymSlice {
+					html += `<span style="white-space:nowrap;">` + a + "</span>"
+					if i < len(antonymSlice)-1 {
+						html += "  "
+					}
+				}
 				html += `&nbsp;<span style="background-color:#A07070; color:white;border-radius:5px;padding:2px;font-size:75%;">反</span></span></span>`
 			}
 			if definition.Synonyms != "" {
 				html += `<span style="color:#BBCCBB;"><span style="background-color:#70A070; color:white;border-radius:5px;padding:2px;font-size:75%;">似</span>&nbsp;`
-                                synonymSlice := strings.Split(definition.Synonyms, ",")
-                                for i, s := range synonymSlice {
-                                    html += `<span style="white-space:nowrap;">`+s+"</span>"
-                                    if i < len(synonymSlice) - 1 {
-                                        html += "  "
-                                    }
-                                }
+				synonymSlice := strings.Split(definition.Synonyms, ",")
+				for i, s := range synonymSlice {
+					html += `<span style="white-space:nowrap;">` + s + "</span>"
+					if i < len(synonymSlice)-1 {
+						html += "  "
+					}
+				}
 				html += `</span><br />`
 			} else {
 				if definition.Antonyms != "" {
@@ -238,7 +238,7 @@ func (e Entry) ToHTML(toneColors []string) string {
 			if definition.Def != "" {
 				nonEmptyDefinition = true
 
-                                html += `<span style="font-size:65%;">♦&nbsp;</span>`
+				html += `<span style="font-size:65%;">♦&nbsp;</span>`
 				html += definition.Def
 				html += "<br>"
 			}
@@ -246,10 +246,10 @@ func (e Entry) ToHTML(toneColors []string) string {
 			// examples
 			for _, example := range definition.Example {
 				nonEmptyDefinition = true
-                                
-                                if strings.HasPrefix(example, "如：") {
-                                    example = string([]rune(example)[2:])
-                                }
+
+				if strings.HasPrefix(example, "如：") {
+					example = string([]rune(example)[2:])
+				}
 
 				html += `<span style="color:#970000;">例</span>: `
 				html += example
