@@ -76,9 +76,9 @@ func FindRecords(word string, charSet chinese.CharSet) ([]Record, error) {
 
   switch charSet {
     case chinese.Trad: 
-    sql += "WHERE trad = '"+word+"'"
+    sql += "WHERE trad LIKE '"+word+"'"
     case chinese.Simp: 
-    sql += "WHERE simp = '"+word+"'"
+    sql += "WHERE simp LIKE '"+word+"'"
   default:
     return nil, fmt.Errorf("cedict: unrecognized character set")
   }
