@@ -29,19 +29,27 @@
         .container
           .span8.offset2
             %ul.nav
-              -# active is set when files are loaded by the server
-              %li#vocab-link
+              %li.dropdown
                 -# TODO Find a better solution for this css hack
-                %a(href="/vocab/" style="padding-left: 0;") Vocab Cards
-              %li#moe-vocab-link
-                %a{:href => "/moe-vocab/"} Moe Cards
+                %a(href="#" style="padding-left: 0;" class="dropdown-toggle" data-toggle="dropdown")
+                  Vocab
+                  %b.caret
+                %ul.dropdown-menu
+                  %li#cedict-link
+                    %a{:href => "/vocab/"} Cedict Cards
+                  %li#moe-vocab-link
+                    %a{:href => "/moe-vocab/"} Moe Cards
+              %li#html-lookup-link
+                %a{:href => "/html-lookup/"} HTML Lookup
+              %li#convert-link
+                %a{:href => "/convert/"} Convert
               %li#sentences-link
                 %a{:href => "/sentences/"} Sentence Cards
               %li#mcds-link
                 %a{:href => "/mcds/"} MCDs
               %li#settings-help-link
                 %a{:href => "/settings/"} Settings
-              %li#about-link
+              -#%li#about-link
                 %a{:href => "/help-about/"} 
                   :plain
                     Help & About

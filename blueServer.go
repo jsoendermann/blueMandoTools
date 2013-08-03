@@ -63,7 +63,7 @@ func main() {
 
 	// the root is handled by an anonymous function that redirects to "/sentences/"
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, helpAboutPath, http.StatusFound)
+		http.Redirect(writer, request, mcdsPath, http.StatusFound)
 	})
 
 	// /vocab/, /sentences/ and /mcds/ are both handled by simple, anonymous functions that
