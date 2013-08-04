@@ -20,12 +20,10 @@ htmlInputWordChanged = ->
 
 	$.ajax({url: "/vocab/lookup/#{word}", async: true, dataType: 'json', data: tones}).success( (response) ->
 		if response["error"] == 'nil'
-			if response["csv"].indexOf($('#html-input-word').val()) == 0
-				$('#html-input-cedict').val(response.csv)
+			$('#html-input-cedict').val(response.csv)
 	)
 
 	$.ajax({url: "/moe-vocab/lookup/#{word}", async: true, dataType: 'json', data: tones}).success( (response) ->
 		if response["error"] == 'nil'
-			if response["csv"].indexOf($('#html-input-word').val()) == 0
-				$('#html-input-moedict').val(response.csv)
+			$('#html-input-moedict').val(response.csv)
 	)
