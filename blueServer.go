@@ -48,16 +48,13 @@ func main() {
 	// Load html files, the array at the end contains the js files to be loaded
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
 	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
+	htmlLookupHtml := mustache.RenderFileInLayout("html-lookup.html", layoutFile, map[string]interface{}{"jsfiles": []string{"html-lookup"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
 	settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
 	helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
 
-	// FIXME reimplement this
-	// set active class in navbar
-	// FIXME find a better way to do this
-	// vocabHtml = strings.Replace(vocabHtml, "<li id='vocab-link'>", "<li id='vocab-link' class='active'>", 1)
-	// sentencesHtml = strings.Replace(sentencesHtml, "<li id='sentences-link'>", "<li id='sentences-link' class='active'>", 1)
+	// FIXME set active class in navbar
 
 	// Set up the http server
 
@@ -66,33 +63,25 @@ func main() {
 		http.Redirect(writer, request, mcdsPath, http.StatusFound)
 	})
 
-	// /vocab/, /sentences/ and /mcds/ are both handled by simple, anonymous functions that
-	// write static html to the ResponseWriter
-	http.HandleFunc(vocabPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, vocabHtml)
-	})
-	http.HandleFunc(moeVocabPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, moeVocabHtml)
-	})
-	http.HandleFunc(sentencesPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, sentencesHtml)
-	})
-	http.HandleFunc(mcdsPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, mcdsHtml)
-	})
+	// small helper function (used below)
+	addStaticHtmlHandler := func(path string, html string) {
+		http.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
+			fmt.Fprintf(writer, html)
+		})
+	}
+
+	addStaticHtmlHandler(vocabPath, vocabHtml)
+	addStaticHtmlHandler(moeVocabPath, moeVocabHtml)
+	addStaticHtmlHandler(htmlLookupPath, htmlLookupHtml)
+	addStaticHtmlHandler(sentencesPath, sentencesHtml)
+	addStaticHtmlHandler(mcdsPath, mcdsHtml)
+	addStaticHtmlHandler(settingsPath, settingsHtml)
+	addStaticHtmlHandler(helpAboutPath, helpAboutHtml)
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
-
-	// /settings/ and /help-about/ handlers
-	http.HandleFunc(settingsPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, settingsHtml)
-	})
-	http.HandleFunc(helpAboutPath, func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprint(writer, helpAboutHtml)
-	})
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))

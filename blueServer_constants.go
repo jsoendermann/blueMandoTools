@@ -4,6 +4,7 @@ package main
 const (
 	moeVocabPath  = "/moe-vocab/"
 	vocabPath     = "/vocab/"
+	htmlLookupPath = "/html-lookup/"
 	sentencesPath = "/sentences/"
 	mcdsPath      = "/mcds/"
 
