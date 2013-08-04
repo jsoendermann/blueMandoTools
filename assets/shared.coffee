@@ -48,3 +48,6 @@
       tones['tone'+n] = unescape(getCookie('tone'+n))
   tones
 
+$(document).ready( ->
+	$('form').submit(false)
+)
