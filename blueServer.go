@@ -49,6 +49,7 @@ func main() {
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
 	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
 	htmlLookupHtml := mustache.RenderFileInLayout("html-lookup.html", layoutFile, map[string]interface{}{"jsfiles": []string{"html-lookup"}})
+	convertHtml := mustache.RenderFileInLayout("convert.html", layoutFile, map[string]interface{}{"jsfiles": []string{"convert"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
 	settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
@@ -73,6 +74,7 @@ func main() {
 	addStaticHtmlHandler(vocabPath, vocabHtml)
 	addStaticHtmlHandler(moeVocabPath, moeVocabHtml)
 	addStaticHtmlHandler(htmlLookupPath, htmlLookupHtml)
+	addStaticHtmlHandler(convertPath, convertHtml)
 	addStaticHtmlHandler(sentencesPath, sentencesHtml)
 	addStaticHtmlHandler(mcdsPath, mcdsHtml)
 	addStaticHtmlHandler(settingsPath, settingsHtml)
@@ -80,6 +82,7 @@ func main() {
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
+	http.HandleFunc(convertLookupPath, convertLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
 
@@ -216,6 +219,8 @@ func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
 	fmt.Fprint(writer, string(j))
 }
+
+func convertLookupHandler(writer http.ResponseWriter, request *http.Request) {} //TODO
 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	sentence := getLastPathComponent(request)

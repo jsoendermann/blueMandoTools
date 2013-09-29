@@ -2,14 +2,16 @@ package main
 
 // Paths on the server
 const (
-	moeVocabPath  = "/moe-vocab/"
-	vocabPath     = "/vocab/"
+	moeVocabPath   = "/moe-vocab/"
+	vocabPath      = "/vocab/"
 	htmlLookupPath = "/html-lookup/"
-	sentencesPath = "/sentences/"
-	mcdsPath      = "/mcds/"
+	convertPath    = "/convert/"
+	sentencesPath  = "/sentences/"
+	mcdsPath       = "/mcds/"
 
 	moeVocabLookupPath  = "/moe-vocab/lookup/"
 	vocabLookupPath     = "/vocab/lookup/"
+	convertLookupPath   = "/convert/lookup/"
 	sentencesLookupPath = "/sentences/lookup/"
 	mcdsLookupPath      = "/mcds/lookup/"
 
