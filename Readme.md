@@ -1,3 +1,6 @@
+This readme is somewhat out of date.
+TODO: update this
+
 # BlueServer
 
 BlueServer is a web app that turns lists of Chinese words and sentences into beautiful Anki cards. It is written in plain Go, HAML and coffee script and uses cc-cedict as its Chinese-English dictionary and the online dictionary of the Taiwanese Ministry of Education as its Chinese-Chinese dictionary. You can see BlueServer live [here](http://thebluemandarinlab.com:8080/)
