@@ -1,0 +1,60 @@
+!!! 5
+%html
+  %head
+    %title The Blue Mandarin Lab - Card Generator
+
+    %link{:rel => "stylesheet", :type => "text/css", :href => "/assets/bootstrap/bootstrap.css"}
+    %link{:rel => "stylesheet", :type => "text/css", :href => "/assets/mcds.css"}
+
+    %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
+    -#%script{:src => "/assets/jquery-1.10.1.min.js"}
+    %script{:src => "/assets/shared.js"}
+    %script{:src => "/assets/bootstrap/bootstrap.js"}
+
+    {{#jsfiles}}
+    %script{:src => "/assets/{{.}}.js"}
+    {{/jsfiles}}
+
+  -#
+    %script{:src => "/assets/vocab.js"}
+    %script{:src => "/assets/sentences.js"}
+    %script{:src => "/assets/mcds.js"}
+    %script{:src => "/assets/mcds-dict.js"}
+    %script{:src => "/assets/settings.js"}
+
+
+  %body(style="padding-top: 60px;")
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          .span8.offset2
+            %ul.nav
+              %li.dropdown
+                -# TODO Find a better solution for this css hack
+                %a(href="#" style="padding-left: 0;" class="dropdown-toggle" data-toggle="dropdown")
+                  Vocab
+                  %b.caret
+                %ul.dropdown-menu
+                  %li#cedict-link
+                    %a{:href => "/vocab/"} Cedict Cards
+                  %li#moe-vocab-link
+                    %a{:href => "/moe-vocab/"} Moe Cards
+              %li#html-lookup-link
+                %a{:href => "/html-lookup/"} HTML Lookup
+              %li#convert-link
+                %a{:href => "/convert/"} Convert
+              %li#sentences-link
+                %a{:href => "/sentences/"} Sentence Cards
+              %li#mcds-link
+                %a{:href => "/mcds/"} MCDs
+              %li#settings-help-link
+                %a{:href => "/settings/"} Settings
+              -#%li#about-link
+                %a{:href => "/help-about/"} 
+                  :plain
+                    Help & About
+
+
+    .container
+      .span8.offset2
+        {{{content}}}

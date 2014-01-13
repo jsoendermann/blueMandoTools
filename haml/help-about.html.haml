@@ -1,0 +1,71 @@
+%h1 Help &amp; About
+-#%form.well
+  %h3 
+    Tone Colours
+  %label 
+    %small
+      :escaped
+        For this to work, your browser needs to implement the <input type="color"> tag.
+
+
+  Neutral: 
+  %input(type="color" name="vsc-tone-0" style="width: 30px;" value="#000000")
+  &nbsp;
+  First: 
+  %input(type="color" name="vsc-tone-1" style="width: 30px;" value="#00ac00")
+  &nbsp;
+  Second: 
+  %input(type="color" name="vsc-tone-2" style="width: 30px;" value="#021bff")
+  &nbsp;
+  Third: 
+  %input(type="color" name="vsc-tone-3" style="width: 30px;" value="#996633")
+  &nbsp;
+  Forth: 
+  %input(type="color" name="vsc-tone-4" style="width: 30px;" value="#ff0000")
+  &nbsp;
+
+  <br><br>
+
+  %a.btn.btn-primary#tone-colors-save Save
+
+-#
+    %label
+      :markdown
+        This page takes a list of simplified or traditional Chinese words and turns them into Anki cards with the word on the front and pinyin and English definitions on the back. You can see an example of the type of cards this page produces [here](/assets/images/vocab-expl.png).
+    %h3 Word List
+    %textarea.span7#vc-words(rows="8" placeholder="Add words here, separated by newlines.")
+
+    <br>
+
+    {{> tone-color-wells}}
+
+    <br><br>
+
+    %label
+      To import the generated cards to Anki, please follow these steps:
+      %ol
+        %li
+          If this is the first time you use this service, please download a vocab deck to import to: 
+          %a{:href => "/assets/anki-decks/Vocab-simp.apkg"} Simplified
+          :escaped
+            /
+          = succeed '.' do
+            %a{:href => "/assets/anki-decks/Vocab-trad.apkg"} Traditional
+
+          :escaped
+            You can also use an existing deck if you know how to map the columns in the csv to the fields of your deck. The format of the csv is <simp>\t<trad>\t<pinyin&english>.
+        %li Copy the contents of the first text area below to a text file and save the file (you will delete this file later).
+        %li Open your sentences deck in Anki and select File→Import.
+        %li Make sure "Allow HTML in fields" is checked and click on "Import".
+        %li The cards should now appear in your deck and you can delete the text file you created in step 2.
+
+    
+    <br><br>
+
+    %textarea.span7#vc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
+
+    %textarea.span7#vc-not-found(rows="8" placeholder="The words that are not in the dictionary will appear here.")
+
+
+
+

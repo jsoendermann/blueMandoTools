@@ -1,0 +1,28 @@
+#mcds-display
+{
+  font-size: 25px;
+  color: #000000;
+  line-height: 200%;
+  text-align: left;
+}
+
+rt
+{
+  color: #999;
+  font-size: 60%;
+}
+
+.already-clozed-rb
+{
+  color: #000;
+}
+
+.already-clozed-rt
+{
+  color: #FFF;
+}
+
+#mcds-code-input
+{
+  width: 50px;
+}

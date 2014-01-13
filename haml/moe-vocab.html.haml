@@ -1,0 +1,21 @@
+%h1 Moe Vocab Cards
+%form.well
+  %label
+    :markdown
+      This page takes a list of simplified or traditional Chinese words and turns them into Anki cards with the @@@.
+  %h3 Word List
+  %textarea.span7#mvc-words(rows="8" placeholder="Add words here, separated by newlines.")
+
+  <br><br>
+
+  %a.btn.btn-primary#mvc-lookup Look up words
+
+  <br><br>
+
+  %textarea.span7#mvc-output(rows="8" placeholder="The generated flashcards will appear here ready for import to Anki after you've added all the words and clicked on \"Look up Words\".")
+
+  %textarea.span7#mvc-not-found(rows="8" placeholder="The words that are not in the dictionary will appear here.")
+
+
+
+
