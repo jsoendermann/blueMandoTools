@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/yangchuanzhang/blueMandoTools/cedict"
-	"github.com/yangchuanzhang/chinese"
+	"github.com/yangchuanzhang/blueMandoTools/chinese"
 	"github.com/yangchuanzhang/blueMandoTools/moedict"
 	"net/http"
 	"strings"

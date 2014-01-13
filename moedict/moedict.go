@@ -7,7 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/yangchuanzhang/bopomofo"
-	"github.com/yangchuanzhang/zhDicts"
+	"github.com/yangchuanzhang/blueMandoTools/zhDicts"
 	"strings"
 )
 
