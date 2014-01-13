@@ -6,7 +6,7 @@ import (
 	"github.com/hoisie/mustache"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
-	"github.com/yangchuanzhang/moedict"
+	"github.com/yangchuanzhang/blueMandoTools/moedict"
 	"github.com/yangchuanzhang/pinyin"
 	"github.com/yangchuanzhang/zhDicts"
 	"net/http"

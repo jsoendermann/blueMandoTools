@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/yangchuanzhang/cedict"
 	"github.com/yangchuanzhang/chinese"
-	"github.com/yangchuanzhang/moedict"
+	"github.com/yangchuanzhang/blueMandoTools/moedict"
 	"net/http"
 	"strings"
 )
