@@ -6,7 +6,7 @@ package moedict
 import (
 	"database/sql"
 	"fmt"
-	"github.com/yangchuanzhang/bopomofo"
+	"github.com/yangchuanzhang/blueMandoTools/bopomofo"
 	"github.com/yangchuanzhang/blueMandoTools/zhDicts"
 	"strings"
 )
