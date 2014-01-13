@@ -7,7 +7,7 @@ import (
   _ "github.com/mattn/go-sqlite3"
   "fmt"
   "github.com/yangchuanzhang/chinese"
-  "github.com/yangchuanzhang/pinyin"
+  "github.com/yangchuanzhang/blueMandoTools/pinyin"
   "github.com/yangchuanzhang/zhDicts"
 )
 
