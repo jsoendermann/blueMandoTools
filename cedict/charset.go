@@ -1,7 +1,7 @@
 package cedict
 
 import (
-  "github.com/yangchuanzhang/blueMandoTools/chinese"
+  "github.com/jsoendermann/blueMandoTools/chinese"
 )
 
 // DetermineCharSet takes a string and returns a variable

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/yangchuanzhang/blueMandoTools/cedict"
-	"github.com/yangchuanzhang/blueMandoTools/chinese"
-	"github.com/yangchuanzhang/blueMandoTools/moedict"
+	"github.com/jsoendermann/blueMandoTools/cedict"
+	"github.com/jsoendermann/blueMandoTools/chinese"
+	"github.com/jsoendermann/blueMandoTools/moedict"
 	"net/http"
 	"strings"
 )

@@ -6,9 +6,9 @@ package cedict
 import (
   _ "github.com/mattn/go-sqlite3"
   "fmt"
-  "github.com/yangchuanzhang/blueMandoTools/chinese"
-  "github.com/yangchuanzhang/blueMandoTools/pinyin"
-  "github.com/yangchuanzhang/blueMandoTools/zhDicts"
+  "github.com/jsoendermann/blueMandoTools/chinese"
+  "github.com/jsoendermann/blueMandoTools/pinyin"
+  "github.com/jsoendermann/blueMandoTools/zhDicts"
 )
 
 type Record struct {
