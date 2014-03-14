@@ -241,6 +241,18 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+    cedictRecords := make([]cedict.Record, 0)
+    for _, word := range words {
+        records, err := cedict.FindRecords(word, charSet)
+        if err != nil {
+            fmt.Fprint(writer, `{"error": "`+err.Error()+`", "sentence": "`+sentence+`"}`)
+            return
+        }
+        for _, record := range records {
+            cedictRecords = append(cedictRecords, record)
+        }
+    }
+
 	// construct csv row
 	var output string
 
@@ -256,7 +268,16 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 		output += "<br>"
 	}
 
-	// TODO add cedict records
+	output += "\t"
+
+    for _, cedictRecord := range cedictRecords {
+        output += cedictRecord.ToHTML(colors)
+        output += "<br>"
+    }
+
+    // This adds an additional field for the audio file
+    output += "\t"
+    output += "."
 
 	// TODO turn this into a function
 
