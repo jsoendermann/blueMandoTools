@@ -277,7 +277,8 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
     // This adds an additional field for the audio file
     output += "\t"
-    output += "."
+    // This is necessary for Anki to recognise all fields
+    output += "&nbsp;"
 
 	// TODO turn this into a function
 
