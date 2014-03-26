@@ -101,6 +101,8 @@ func vocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	word := getLastPathComponent(request)
 	colors := getColors(request)
 
+    fmt.Println("vocabLookupHandler: " + word)
+
 	// search the db for records (simp first, if unsuccessful, try trad)
 	// and send errors back to client if any occur
 	records, err := cedict.FindRecords(word, chinese.Simp)
@@ -182,6 +184,8 @@ func moeVocabLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	word := getLastPathComponent(request)
 	colors := getColors(request)
 
+    fmt.Println("moeVocabLookupHandler: " + word)
+
 	// convert to trad
 	tradWord, err := cedict.Simp2Trad(word)
 	if err != nil {
@@ -225,6 +229,8 @@ func convertLookupHandler(writer http.ResponseWriter, request *http.Request) {} 
 func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	sentence := getLastPathComponent(request)
 	colors := getColors(request)
+
+    fmt.Println("sentencesLookupHandler: " + string([]rune(sentence)[0:10]) + "。。。")
 
 	// get words in sentence
 	wordsRaw := findWordsInSentencesRegexp.FindAllStringSubmatch(sentence, -1)
@@ -299,6 +305,8 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	mcd := getLastPathComponent(request)
 	colors := getColors(request)
+
+    fmt.Println("mcdsLookupHandler: " + string([]rune(mcd)[0:10]) + "。。。")
 
 	// get clozed char and original text
 	mcd = strings.Replace(mcd, "@SLASH@", "/", -1)
