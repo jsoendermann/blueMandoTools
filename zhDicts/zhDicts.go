@@ -2,17 +2,14 @@ package zhDicts
 
 import (
     "database/sql"
-    _ "github.com/mattn/go-sqlite3"
-    "os"
+    _ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
 func LoadDb() error {
-    dbPath := os.Getenv("ZHDICTS_DB")
-
     var err error
-    db, err = sql.Open("sqlite3", dbPath)
+    db, err = sql.Open("postgres", "user=json dbname=json host=localhost sslmode=disable")
     if err != nil {
         return err
     }

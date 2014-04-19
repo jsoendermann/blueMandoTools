@@ -4,7 +4,6 @@ TODO: add package description
 package cedict
 
 import (
-  _ "github.com/mattn/go-sqlite3"
   "fmt"
   "github.com/jsoendermann/blueMandoTools/chinese"
   "github.com/jsoendermann/blueMandoTools/pinyin"
