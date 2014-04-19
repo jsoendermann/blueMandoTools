@@ -303,85 +303,149 @@ func sentencesLookupHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
-	mcd := getLastPathComponent(request)
+	text := getLastPathComponent(request)
+    text = strings.Replace(text, "@SLASH@", "/", -1)
+    text = strings.Replace(text, "\n", "<br />", -1)
+    text = strings.Replace(text, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;", -1)
+
+    notes := request.FormValue("notes")
+    notes = strings.Replace(notes, "@SLASH@", "/", -1)
+    notes = strings.Replace(notes, "\n", "<br />", -1)
+    notes = strings.Replace(notes, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;", -1)
+
+    charsRaw := request.FormValue("chars")
+    charsArrayRaw := strings.Split(charsRaw, " ")
+    // Construct new slice without empty strings
+    chars := make([]string, 0)
+    for _, char := range charsArrayRaw {
+        if char != "" {
+            chars = append(chars, char)
+        }
+    }
+
 	colors := getColors(request)
 
-    fmt.Println("mcdsLookupHandler: " + string([]rune(mcd)[0:10]) + "。。。")
+    charSet := cedict.DetermineCharSet(text)
 
-	// get clozed char and original text
-	mcd = strings.Replace(mcd, "@SLASH@", "/", -1)
-	back := strings.Split(mcd, "\t")[1]
-	chars := findCharInMcdsRegexp.FindAllStringSubmatch(back, -1)
-	clozeChar := chars[0][1]
-	originalText := strings.Replace(back, clozeBegin+clozeChar+clozeEnd, clozeChar, -1)
 
-	splitText, err := cedict.SplitChineseTextIntoWords(originalText)
-	if err != nil {
-		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+    // This is where this function spends most of its time
+    splitText, err := cedict.SplitChineseTextIntoWords(text)
+    if err != nil {
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
 		return
 	}
 
-	charSet := cedict.DetermineCharSet(originalText)
+    var output string
 
-	words := make([]string, 0)
-	cedictRecords := make([]cedict.Record, 0)
+    // Go through all chars to be clozed. Every iteration adds one line to the output var (i.e. one card)
+    for _, char := range chars {
+        var front, back string
+        cedictRecords := make([]cedict.Record, 0)
+        wordsToBeLookedUpInMoedict := make([]string, 0)
 
-	for _, ctw := range splitText {
-		if ctw.T == cedict.WordTypeRecords {
-			if cw := ctw.R[0].WordByCharSet(charSet); strings.Index(cw, clozeChar) != -1 {
-				wordInArray := false
-				for _, ew := range words {
-					if ew == cw {
-						wordInArray = true
-					}
-				}
-				if !wordInArray {
-					words = append(words, cw)
-					for _, r := range ctw.R {
-						cedictRecords = append(cedictRecords, r)
-					}
-				}
-			}
-		}
-	}
+        // This loop goes through all words in the text. This could be optimised by only going
+        // through the text once and constructing all cards simultaneously
+        for _, wordInText := range splitText {
+            if wordInText.T == cedict.WordTypeString {
+                front += strings.Replace(wordInText.S, char, clozeBegin + clozeChar + clozeEnd, -1)
+                back += strings.Replace(wordInText.S, char, clozeBegin + char + clozeEnd, -1)
 
-	moeEntries, err := findMoeEntriesForWords(words, charSet)
-	if err != nil {
-		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
-		return
-	}
+                wordsToBeLookedUpInMoedict = append(wordsToBeLookedUpInMoedict, wordInText.S)
+            } else if wordInText.T == cedict.WordTypeRecords {
+                wordInTextAsString := wordInText.R[0].WordByCharSet(charSet)
+                indexOfChar := strings.Index(wordInTextAsString, char)
 
-	// construct csv row
-	var output string
+                if indexOfChar == -1 {
+                    front += wordInTextAsString
+                    back += wordInTextAsString
+                } else {
+                    front += strings.Replace(wordInTextAsString, char, clozeBegin + clozeChar + clozeEnd, -1)
+                    back += strings.Replace(wordInTextAsString, char, clozeBegin + char + clozeEnd, -1)
+                    
+                    for _, record := range wordInText.R {
+                        cedictRecords = append(cedictRecords, record)
+                    }
 
-	output += mcd
-	output += "\t"
+                    wordsToBeLookedUpInMoedict = append(wordsToBeLookedUpInMoedict, wordInTextAsString)
+                    
+                }
+            } else {
+                fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
+		        return
+            }
+        }
 
-	for _, moeEntry := range moeEntries {
-		output += moeEntry.ToHTML(colors)
-		output += "<br>"
-	}
+        // Find unique records
+        cedictRecordsUnique := make([]cedict.Record,0)
+        for _, record := range cedictRecords {
+            alreadyInCedictRecordsUnique := false
+            for _, recordUnique := range cedictRecordsUnique {
+                if record == recordUnique {
+                    alreadyInCedictRecordsUnique = true
+                }
+            }
+            if !alreadyInCedictRecordsUnique {
+                cedictRecordsUnique = append(cedictRecordsUnique, record)
+            }
+        }
 
-	output += "\t"
+        // Fine unique words to be looked up in moedict
+        wordsToBeLookedUpInMoedictUnique := make([]string, 0)
+        for _, word := range wordsToBeLookedUpInMoedict {
+            alreadyInWordsToBeLookedUpInMoedictUnique := false
+            for _, wordUnique := range wordsToBeLookedUpInMoedictUnique {
+                if word == wordUnique {
+                    alreadyInWordsToBeLookedUpInMoedictUnique = true
+                }
+            }
+            if !alreadyInWordsToBeLookedUpInMoedictUnique {
+                wordsToBeLookedUpInMoedictUnique = append(wordsToBeLookedUpInMoedictUnique, word)
+            }
+        }
 
-	for _, cr := range cedictRecords {
-		output += cr.ToHTML(colors)
-		output += "<br>"
-	}
+        moeEntries, err := findMoeEntriesForWords(wordsToBeLookedUpInMoedictUnique, charSet)
+	    if err != nil {
+		    fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
+		    return
+	    }
 
-	// TODO turn this into a function
+        output += front
+        output += "\t"
+        output += back
+        output += "\t"
+        output += notes
+        output += "\t"
+
+        for _, moeEntry := range moeEntries {
+            output += moeEntry.ToHTML(colors)
+            output += "<br>"
+        }
+
+        output += "\t"
+
+        for _, cr := range cedictRecordsUnique {
+            output += cr.ToHTML(colors)
+            output += "<br>"
+        }
+
+        output += "\n"
+    }
+
+    // TODO turn this into a function
 
 	// use json.Marshal with an anonymous variable to escape the \t and " characters
 	// in the response
 	j, err := json.Marshal(map[string]interface{}{
 		"error": "nil",
-		"csv":   output,
+		"result":   output,
 	})
 	if err != nil {
-		fmt.Fprint(writer, `{"error": "`+err.Error()+`", "mcd": "`+mcd+`"}`)
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
 		return
 	}
 
 	fmt.Fprint(writer, string(j))
+    
+
 
 }

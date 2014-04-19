@@ -155,12 +155,16 @@ function processCodeInputKeyup()
     var rts = $(".rt-"+code);
 
     rts.fadeTo("fast", 0);
+    
+    $("#mcds-clozed-chars").val($("#mcds-clozed-chars").val() + reverseDict[code] + " ");
+
 
     $("#mcds-code-input").val("");
-    var mcdsOutputVal = $("#mcds-output").val();
+    
+    /*var mcdsOutputVal = $("#mcds-output").val();
     $("#mcds-output").val(mcdsOutputVal+(mcdsOutputVal==""?"":"\n")+generateMCD(reverseDict[code]));
     var mcdsOutputTa = $("#mcds-output");
-    mcdsOutputTa.scrollTop(mcdsOutputTa[0].scrollHeight - mcdsOutputTa.height());
+    mcdsOutputTa.scrollTop(mcdsOutputTa[0].scrollHeight - mcdsOutputTa.height());*/
 
     // #####
 

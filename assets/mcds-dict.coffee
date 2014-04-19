@@ -1,27 +1,24 @@
 $(document).ready( ->
-  # Button: Lookup Words
-  $('#mcds-lookup').on('click', ->
-    mcdsLookupClicked()
-  )
+    # Button: Lookup Words
+    $('#mcds-lookup').on('click', ->
+        mcdsLookupClicked()
+    )
 
   selectAllOnFocus('#mcds-dict-output')
 )
 
 # Lookup button event handler
 mcdsLookupClicked = ->
-  mcds = $('#mcds-output').val().split("\n")
+    #mcds = $('#mcds-output').val().split("\n")
+    
+    text = $('#mcds-input').val().replace(/\//g, '@SLASH@')
+    notes = $('#mcds-notes').val().replace(/\//g, '@SLASH@')
 
-  tones = getColors()
+    chars = $('#mcds-clozed-chars').val()
 
-  for mcd in mcds
-    #FIXME find a better solution 
-    mcd = mcd.replace(/\//g, '@SLASH@');
-    # make ajax request to server
-    $.ajax({url: "/mcds/lookup/#{encodeURIComponent(mcd)}", async: true, dataType: 'json', data: tones}).success( (response) ->
-      # TODO handle error
-      if response["error"] == 'nil'
-        textAreaAddLineAndScroll '#mcds-dict-output', response['csv']
-      else
-        console.log response["error"]
+    tones = getColors()
+
+    $.ajax({url: "/mcds/lookup/#{encodeURIComponent(text)}?chars=#{encodeURIComponent(chars)}&notes=#{encodeURIComponent(notes)}", async: true, dataType: 'json', data: tones}).success( (response) ->
+        if response['error'] == 'nil'
+            $('#mcds-dict-output').val($('#mcds-dict-output').val() + response['result'])
     )
-
