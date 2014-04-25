@@ -46,6 +46,7 @@ func main() {
 	}
 
 	// Load html files, the array at the end contains the js files to be loaded
+    homeHtml := mustache.RenderFileInLayout("home.html", layoutFile, map[string]interface{}{})
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
 	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
@@ -57,11 +58,6 @@ func main() {
 
 	// Set up the http server
 
-	// the root is handled by an anonymous function that redirects to "/sentences/"
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, mcdsPath, http.StatusFound)
-	})
-
 	// small helper function (used below)
 	addStaticHtmlHandler := func(path string, html string) {
 		http.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
@@ -69,6 +65,7 @@ func main() {
 		})
 	}
 
+    addStaticHtmlHandler(homePath, homeHtml)
 	addStaticHtmlHandler(vocabPath, vocabHtml)
 	addStaticHtmlHandler(moeVocabPath, moeVocabHtml)
 	addStaticHtmlHandler(sentencesPath, sentencesHtml)

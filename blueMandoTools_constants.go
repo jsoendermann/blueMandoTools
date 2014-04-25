@@ -1,7 +1,9 @@
 package main
 
 // Paths on the server
+// TODO Turn this into something that the main function can loop over
 const (
+    homePath       = "/"
 	moeVocabPath   = "/moe-vocab/"
 	vocabPath      = "/vocab/"
 	sentencesPath  = "/sentences/"
