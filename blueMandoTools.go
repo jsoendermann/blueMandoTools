@@ -48,14 +48,12 @@ func main() {
 	// Load html files, the array at the end contains the js files to be loaded
 	vocabHtml := mustache.RenderFileInLayout("vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"vocab"}})
 	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
-	htmlLookupHtml := mustache.RenderFileInLayout("html-lookup.html", layoutFile, map[string]interface{}{"jsfiles": []string{"html-lookup"}})
-	convertHtml := mustache.RenderFileInLayout("convert.html", layoutFile, map[string]interface{}{"jsfiles": []string{"convert"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
 	settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
-	helpAboutHtml := mustache.RenderFileInLayout("help-about.html", layoutFile)
 
 	// FIXME set active class in navbar
+
 
 	// Set up the http server
 
@@ -73,16 +71,12 @@ func main() {
 
 	addStaticHtmlHandler(vocabPath, vocabHtml)
 	addStaticHtmlHandler(moeVocabPath, moeVocabHtml)
-	addStaticHtmlHandler(htmlLookupPath, htmlLookupHtml)
-	addStaticHtmlHandler(convertPath, convertHtml)
 	addStaticHtmlHandler(sentencesPath, sentencesHtml)
 	addStaticHtmlHandler(mcdsPath, mcdsHtml)
 	addStaticHtmlHandler(settingsPath, settingsHtml)
-	addStaticHtmlHandler(helpAboutPath, helpAboutHtml)
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
-	http.HandleFunc(convertLookupPath, convertLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
 

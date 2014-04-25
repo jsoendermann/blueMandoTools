@@ -29,20 +29,18 @@
         .container
           .span8.offset2
             %ul.nav
-              %li.dropdown
+              -#%li.dropdown
                 -# TODO Find a better solution for this css hack
                 %a(href="#" style="padding-left: 0;" class="dropdown-toggle" data-toggle="dropdown")
                   Vocab
                   %b.caret
                 %ul.dropdown-menu
-                  %li#cedict-link
-                    %a{:href => "/vocab/"} Cedict Cards
-                  %li#moe-vocab-link
-                    %a{:href => "/moe-vocab/"} Moe Cards
-              %li#html-lookup-link
-                %a{:href => "/html-lookup/"} HTML Lookup
-              %li#convert-link
-                %a{:href => "/convert/"} Convert
+              %li#home-link
+                %a{:href => "/"} Home
+              %li#cedict-link
+                %a{:href => "/vocab/"} Cedict Cards
+              %li#moe-vocab-link
+                %a{:href => "/moe-vocab/"} Moe Cards
               %li#sentences-link
                 %a{:href => "/sentences/"} Sentence Cards
               %li#mcds-link
