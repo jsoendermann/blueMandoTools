@@ -238,7 +238,7 @@ func (e Entry) ToHTML(toneColors []string) string {
 			if definition.Def != "" {
 				nonEmptyDefinition = true
 
-				html += `<span style="font-size:65%;">➜&nbsp;</span>`
+				html += `<span style="font-size:65%;">➤&nbsp;</span>`
 				html += definition.Def
 				html += "<br>"
 			}
