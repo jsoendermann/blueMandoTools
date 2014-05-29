@@ -37,15 +37,15 @@
 @getColors = ->
     tones = {}
     for n in [0..4]
-        if getCookie("tone"+n) == "undefined" or getCookie("tone"+n) == null
+        if getCookie("tone"+n) == undefined or getCookie("tone"+n) == null
             switch n
                 when 0 then tones['tone'+n] = "#000000"
                 when 1 then tones['tone'+n] = "#00ac00"
                 when 2 then tones['tone'+n] = "#021bff"
                 when 3 then tones['tone'+n] = "#996633"
                 when 4 then tones['tone'+n] = "#ff0000"
-                else
-                    tones['tone'+n] = unescape(getCookie('tone'+n))
+        else
+            tones['tone'+n] = unescape(getCookie('tone'+n))
     tones
 
 $(document).ready( ->
