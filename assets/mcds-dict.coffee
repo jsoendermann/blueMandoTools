@@ -4,13 +4,11 @@ $(document).ready( ->
         mcdsLookupClicked()
     )
 
-  selectAllOnFocus('#mcds-dict-output')
+    selectAllOnFocus('#mcds-dict-output')
 )
 
 # Lookup button event handler
 mcdsLookupClicked = ->
-    #mcds = $('#mcds-output').val().split("\n")
-    
     text = $('#mcds-input').val().replace(/\//g, '@SLASH@')
     notes = $('#mcds-notes').val().replace(/\//g, '@SLASH@')
 

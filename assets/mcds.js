@@ -1,202 +1,148 @@
-// constants
-var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
-var nonCharacters = new Array('0', '1', '2', '3', '4',
-    '5', '6', '7', '8', '9', 
-    '（', '）', '(', ')', "！", "!", "？", "?", "~",
-    '「', '」', '《', '》', '【', '】', '…',
-    '。', '，', '、', '　', ' ', '；',
-    '.', ',', ';', '"', "'", "“", "”", "—", "-", "_",
-    '：', ':', "\n", ' ');
-nonCharacters = nonCharacters.concat(alphabet, "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
-var easyToReachKeys = new Array('f', 'd', 'k', 'r', 
-    'u', 'e', 'i', 's', 'l', 
-    'w', 'o', 'j');
-var frequentlyUsedChars = "的當了在有为為以就才".split("");
-var keysForFrequentlyUsedChars = new Array();
-for (var i in alphabet)
-{
-  var c = alphabet[i];
-  if (easyToReachKeys.indexOf(c) == -1)
-    keysForFrequentlyUsedChars.push(c);
-}
-var CLOZE_BEGIN = '<span style="font-weight:600;color:#ff12c7;">';
-var CLOZE_END = '</span>';
-var CLOZE_SYMBOL = CLOZE_BEGIN+'％'+CLOZE_END;
+/* global $ */
+
+(function ($) {
+    "use strict";
+
+    var alphabet, nonChineseCharacters, firstLettersInCodes, charToCodeDict, codeToCharDict;
+
+    // constants
+    alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+    nonChineseCharacters = '0123456789（）()！!？?~～"「」《》【】…\'。，、　 ；.,;"“”—-_：:\n", \t'.split();
+    nonChineseCharacters += alphabet.split();
+    nonChineseCharacters += alphabet.toUpperCase().split('');
+
+    firstLettersInCodes = 'fjdkslaurieowpq'.split('');
+    firstLettersInCodes.splice(0, 0, '');
+
+    // objects shared among the functions
+    charToCodeDict = {};
+    codeToCharDict = {};
 
 
-// dicts
-var dict = {};
-var reverseDict = {};
-var pos = 0;
 
+    $(function(){
+        $("#mcds-input").keyup(function() {
+            processInputText();
+        });
 
-function generateDict(characters)
-{
-  dict = {};
-  reverseDict = {};
-  pos = 0;
+        $("#mcds-code-input").keyup(function() {
+            processCodeInputKeyup();
+        });
 
-  var iEtrk = 0, iAlphabet = 0;
-  var iFuc = 0;
+        processInputText($("#mcds-input").val());
+    });
 
-  for (var i in characters)
-  {
-    var v = characters[i];
+    function processInputText() {
+        var text, uniqueCharacters, chineseCharacters, i, character;
 
-    if (!dict[v])
-    {
-      if (frequentlyUsedChars.indexOf(v) != -1)
-      {
-        dict[v] = keysForFrequentlyUsedChars[iFuc];
-        reverseDict[keysForFrequentlyUsedChars[iFuc]] = v;
-        iFuc++;
-      }
-      else
-      {
-        var c = easyToReachKeys[iEtrk]+alphabet[iAlphabet];
-        dict[v] = c;
-        reverseDict[c] = v;
-        iAlphabet++;
-      }
+        text = $("#mcds-input").val();
+        
+        uniqueCharacters = eliminateDuplicates(text.split(""));
+
+        // remove non chinese characters from array
+        chineseCharacters = [];
+        for (i = 0; i < uniqueCharacters.length; i++) {
+            character = uniqueCharacters[i];
+            if (nonChineseCharacters.indexOf(character) === -1) {
+                chineseCharacters.push(character);
+            }
+        }
+
+        generateDict(chineseCharacters);
+        updateTextDisplay();
+        $("#mcds-clozed-chars").val("");
     }
-    if (iAlphabet >= alphabet.length)
-    {
-      iAlphabet = 0;
-      iEtrk++;
+
+    function processCodeInputKeyup() {
+        var code, codeRubyClass;
+        code = $("#mcds-code-input").val();
+
+        if (typeof codeToCharDict[code] !== 'undefined') {
+            codeRubyClass = $(".rt-" + code);
+            codeRubyClass.fadeTo("fast", 0);
+
+            $("#mcds-clozed-chars").val($("#mcds-clozed-chars").val() + codeToCharDict[code] + " ");
+            $("#mcds-code-input").val("");
+        }
     }
-  }
-
-  return;
-}
-
-function generateMCD(clozedChar)
-{
-  var text = $("#mcds-input").val();
-  var notes = $("#mcds-notes").val();
-  notes = notes.replace(/\n/g,'<br />');
-  notes = notes.replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;');
-  text = text.replace(/\n/g,'<br />');
-  text = text.replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;');
-  var regex = new RegExp(clozedChar, "g");
-  var front = text.replace(regex, CLOZE_SYMBOL);
-  var back = text.replace(regex, CLOZE_BEGIN+clozedChar+CLOZE_END);
-
-  return front+"\t"+back+"\t"+notes;
-}
-
-function generateHTML()
-{
-  var text = $("#mcds-input").val();
-  text = text.replace(/\n/g,"☃");
-  var output = "";
-  var textSplit = text.split("");
-
-  for (var i in textSplit)
-  {
-    var v = textSplit[i];
-
-    if (v == "☃")
-      output += "<br />";
-
-    else if (dict[v])
-      output += "<ruby><rb>"+v+'</rb><rt class="rt-'+dict[v]+'" id="rt-'+i+'">'+dict[v]+"</rt></ruby>";
-    else
-      output += v;
-  }
-  return output;
-}
-
-function processInput(rawInput)
-{
-  var allCharacters = eliminateDuplicates(rawInput.split(""));
-
-  // remove non chinese characters from array
-  var chineseCharacters = new Array();
-
-  for (var i in allCharacters)
-  {
-    var v = allCharacters[i];
-    if (nonCharacters.indexOf(v) == -1)
-      chineseCharacters.push(v);
-  }
-
-  generateDict(chineseCharacters);
-
-  $("#mcds-display").html(generateHTML());
-}
 
 
-function eliminateDuplicates(arr) {
-  var i,
-      len=arr.length,
-      out=[],
-      obj={};
+    function generateDict(characters) {
+        var possibleCodes, possibleCodesIndex, i, character, code;
 
-  for (i=0;i<len;i++) {
-    obj[arr[i]]=0;
-  }
-  for (i in obj) {
-    out.push(i);
-  }
-  return out;
-}
+        charToCodeDict = {};
+        codeToCharDict = {};
 
-function processCodeInputKeyup()
-{
-  var code = $("#mcds-code-input").val();
+        possibleCodes = cartesianProduct(firstLettersInCodes, alphabet.split(''));
+        possibleCodesIndex = 0;
 
-  if (reverseDict[code])
-  {
-    //var original = "<ruby><rb>"+reverseDict[code]+"</rb><rt>"+code+"</rt></ruby>";
-    //var regex = new RegExp(original, "g");
-    //var replaceBy = '<ruby><rb class="already-clozed-rb">'+reverseDict[code]+'</rb><rt class="already-clozed-rt">'+code+"</rt></ruby>"
+        for (i = 0; i < characters.length; i++) {
+            character = characters[i];
 
-    // $("#mcds-display").html($("#mcds-display").html().replace(regex, replaceBy));
-    var rts = $(".rt-"+code);
+            if (typeof charToCodeDict[character] === 'undefined') {
+                code = possibleCodes[possibleCodesIndex];
 
-    rts.fadeTo("fast", 0);
-    
-    $("#mcds-clozed-chars").val($("#mcds-clozed-chars").val() + reverseDict[code] + " ");
+                charToCodeDict[character] = code;
+                codeToCharDict[code] = character;
+                possibleCodesIndex++;
+            }
+        }
+    }
 
+    function updateTextDisplay() {
+        var text, output, i, character;
 
-    $("#mcds-code-input").val("");
-    
-    /*var mcdsOutputVal = $("#mcds-output").val();
-    $("#mcds-output").val(mcdsOutputVal+(mcdsOutputVal==""?"":"\n")+generateMCD(reverseDict[code]));
-    var mcdsOutputTa = $("#mcds-output");
-    mcdsOutputTa.scrollTop(mcdsOutputTa[0].scrollHeight - mcdsOutputTa.height());*/
+        text = $("#mcds-input").val();
 
-    // #####
+        output = "";
 
-    /*$("#mcds-notes").val($("#mcds-notes").val()+rts.length);
-      for (var i in rts.length) {
+        for (i = 0; i < text.length; i++) {
+            character = text[i];
 
-    //var v = rts[i];
-    //$("#mcds-notes").val($("#mcds-notes").val()+v);
-    $("#mcds-notes").val($("#mcds-notes").val()+i);
-    }*/
-  }
+            if (typeof charToCodeDict[character] === 'undefined') {
+                output += character;
+            } else {
+                output += constructRubyHtmlForChar(character);
+            }
+        }
 
-}
+        output = output.replace(/\n/g, '<br />');
 
+        $("#mcds-display").html(output);
+    }
 
-$(function(){
-  if (! ($("#mcds-input").val() == undefined)) {
-    console.log("Executing mcds.js functions")
+    function constructRubyHtmlForChar(character) {
+        var output = "";
 
-    $("#mcds-input").keyup(function() {
-      processInput($("#mcds-input").val());
-    })
-    $("#mcds-code-input").keyup(function() {
-      processCodeInputKeyup();
-    })
-    $("#mcds-output").click(function() {
-      $("#mcds-output").focus();
-      $("#mcds-output").select();
-    })
+        output += '<ruby><rb>' + character + '</rb>' +
+            '<rt class="rt-' + charToCodeDict[character] + '">' +
+            charToCodeDict[character] + "</rt></ruby>";
 
-    processInput($("#mcds-input").val());
-  }
-});
+        return output;
+    }
 
+    function eliminateDuplicates(array) {
+        var uniqueArray = [];
 
+        $.each(array, function(i, element) {
+            if($.inArray(element, uniqueArray) === -1) {
+                uniqueArray.push(element);
+            }
+        });
+
+        return uniqueArray;
+    }
+
+    function cartesianProduct(array1, array2) {
+        var product = [];
+
+        $.each(array1, function(i, element1) {
+            $.each(array2, function(j, element2) {
+                product.push(element1 + element2);
+            });
+        });
+
+        return product;
+    }
+})($);
