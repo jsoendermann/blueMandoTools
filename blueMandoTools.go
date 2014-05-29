@@ -317,10 +317,7 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 	colors := getColors(request)
 
     charSet := cedict.DetermineCharSet(text)
-
-
-    // This is where this function spends most of its time
-    splitText, err := cedict.SplitChineseTextIntoWords(text)
+    splitText, err := chinese.SplitChineseTextIntoWords(text, charSet)
     if err != nil {
 		fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
 		return
@@ -331,70 +328,46 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
     // Go through all chars to be clozed. Every iteration adds one line to the output var (i.e. one card)
     for _, char := range chars {
         var front, back string
-        cedictRecords := make([]cedict.Record, 0)
-        wordsToBeLookedUpInMoedict := make([]string, 0)
+        wordsToBeLookedUp := make([]string, 0)
 
         // This loop goes through all words in the text. This could be optimised by only going
         // through the text once and constructing all cards simultaneously
         for _, wordInText := range splitText {
-            if wordInText.T == cedict.WordTypeString {
-                front += strings.Replace(wordInText.S, char, clozeBegin + clozeChar + clozeEnd, -1)
-                back += strings.Replace(wordInText.S, char, clozeBegin + char + clozeEnd, -1)
-
-                wordsToBeLookedUpInMoedict = append(wordsToBeLookedUpInMoedict, wordInText.S)
-            } else if wordInText.T == cedict.WordTypeRecords {
-                wordInTextAsString := wordInText.R[0].WordByCharSet(charSet)
-                indexOfChar := strings.Index(wordInTextAsString, char)
-
-                if indexOfChar == -1 {
-                    front += wordInTextAsString
-                    back += wordInTextAsString
-                } else {
-                    front += strings.Replace(wordInTextAsString, char, clozeBegin + clozeChar + clozeEnd, -1)
-                    back += strings.Replace(wordInTextAsString, char, clozeBegin + char + clozeEnd, -1)
-                    
-                    for _, record := range wordInText.R {
-                        cedictRecords = append(cedictRecords, record)
-                    }
-
-                    wordsToBeLookedUpInMoedict = append(wordsToBeLookedUpInMoedict, wordInTextAsString)
-                    
-                }
+            indexOfChar := strings.Index(wordInText, char)
+            if indexOfChar == -1 {
+                front += wordInText
+                back += wordInText
             } else {
-                fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
-		        return
-            }
-        }
-
-        // Find unique records
-        cedictRecordsUnique := make([]cedict.Record,0)
-        for _, record := range cedictRecords {
-            alreadyInCedictRecordsUnique := false
-            for _, recordUnique := range cedictRecordsUnique {
-                if record == recordUnique {
-                    alreadyInCedictRecordsUnique = true
-                }
-            }
-            if !alreadyInCedictRecordsUnique {
-                cedictRecordsUnique = append(cedictRecordsUnique, record)
+                front += strings.Replace(wordInText, char, clozeBegin + clozeChar + clozeEnd, -1)
+                back += strings.Replace(wordInText, char, clozeBegin + char + clozeEnd, -1)
+            
+                wordsToBeLookedUp = append(wordsToBeLookedUp, wordInText)
             }
         }
 
         // Fine unique words to be looked up in moedict
-        wordsToBeLookedUpInMoedictUnique := make([]string, 0)
-        for _, word := range wordsToBeLookedUpInMoedict {
-            alreadyInWordsToBeLookedUpInMoedictUnique := false
-            for _, wordUnique := range wordsToBeLookedUpInMoedictUnique {
+        wordsToBeLookedUnique := make([]string, 0)
+        for _, word := range wordsToBeLookedUp {
+            alreadyInWordsToBeLookedUpUnique := false
+            for _, wordUnique := range wordsToBeLookedUnique {
                 if word == wordUnique {
-                    alreadyInWordsToBeLookedUpInMoedictUnique = true
+                    alreadyInWordsToBeLookedUpUnique = true
                 }
             }
-            if !alreadyInWordsToBeLookedUpInMoedictUnique {
-                wordsToBeLookedUpInMoedictUnique = append(wordsToBeLookedUpInMoedictUnique, word)
+            if !alreadyInWordsToBeLookedUpUnique {
+                wordsToBeLookedUnique = append(wordsToBeLookedUnique, word)
             }
         }
 
-        moeEntries, err := findMoeEntriesForWords(wordsToBeLookedUpInMoedictUnique, charSet)
+        cedictRecords := make([]cedict.Record,0)
+        for _, wordToBeLookedUpInCedict := range wordsToBeLookedUnique {
+            records, _ := cedict.FindRecords(wordToBeLookedUpInCedict, charSet)
+            for _, record := range records {
+                cedictRecords = append(cedictRecords, record)
+            }
+        }
+
+        moeEntries, err := findMoeEntriesForWords(wordsToBeLookedUnique, charSet)
 	    if err != nil {
 		    fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
 		    return
@@ -414,7 +387,7 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
 
         output += "\t"
 
-        for _, cr := range cedictRecordsUnique {
+        for _, cr := range cedictRecords {
             output += cr.ToHTML(colors)
             output += "<br>"
         }

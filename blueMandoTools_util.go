@@ -36,9 +36,9 @@ func findMoeEntriesForWords(words []string, charSet chinese.CharSet) ([]moedict.
 			if err != nil {
 				return nil, err
 			}
-      if entry != nil {
-        moeEntries = append(moeEntries, *entry)
-      }
+			if entry != nil {
+				moeEntries = append(moeEntries, *entry)
+			}
 		}
 	}
 
