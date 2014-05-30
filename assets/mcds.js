@@ -8,7 +8,7 @@
     // constants
     alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-    nonChineseCharacters = '0123456789（）()！!？?~～"「」《》【】…\'。，、　 ；.,;"“”—-_：:\n", \t'.split();
+    nonChineseCharacters = '0123456789（）()！!？?~～"「」《》<>【】[]{}^&*$#…\'。，、　 ；.,;"“”—-_：:\n", \t'.split();
     nonChineseCharacters += alphabet.split();
     nonChineseCharacters += alphabet.toUpperCase().split('');
 
