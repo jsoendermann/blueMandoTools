@@ -20,7 +20,6 @@
     codeToCharDict = {};
 
 
-
     $(function(){
         $("#mcds-input").keyup(function() {
             processInputText();
@@ -113,13 +112,9 @@
     }
 
     function constructRubyHtmlForChar(character) {
-        var output = "";
-
-        output += '<ruby><rb>' + character + '</rb>' +
+        return '<ruby><rb>' + character + '</rb>' +
             '<rt class="rt-' + charToCodeDict[character] + '">' +
             charToCodeDict[character] + "</rt></ruby>";
-
-        return output;
     }
 
     function eliminateDuplicates(array) {
