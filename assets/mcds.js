@@ -13,7 +13,6 @@
     nonChineseCharacters += alphabet.toUpperCase().split('');
 
     firstLettersInCodes = 'fjdkslaurieowpq'.split('');
-    firstLettersInCodes.splice(0, 0, '');
 
     // objects shared among the functions
     charToCodeDict = {};
