@@ -18,5 +18,5 @@ mcdsLookupClicked = ->
 
     $.ajax({url: "/mcds/lookup/#{encodeURIComponent(text)}?chars=#{encodeURIComponent(chars)}&notes=#{encodeURIComponent(notes)}", async: true, dataType: 'json', data: tones}).success( (response) ->
         if response['error'] == 'nil'
-            $('#mcds-dict-output').val($('#mcds-dict-output').val() + response['result'])
+            textAreaAddLineAndScroll '#mcds-dict-output', response['result']
     )
