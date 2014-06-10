@@ -51,6 +51,7 @@ func main() {
 	moeVocabHtml := mustache.RenderFileInLayout("moe-vocab.html", layoutFile, map[string]interface{}{"jsfiles": []string{"moe-vocab"}})
 	sentencesHtml := mustache.RenderFileInLayout("sentences.html", layoutFile, map[string]interface{}{"jsfiles": []string{"sentences"}})
 	mcdsHtml := mustache.RenderFileInLayout("mcds.html", layoutFile, map[string]interface{}{"jsfiles": []string{"mcds", "mcds-dict"}})
+    pinyinifyHtml := mustache.RenderFileInLayout("pinyinify.html", layoutFile, map[string]interface{}{"jsfiles": []string{"pinyinify"}})
 	settingsHtml := mustache.RenderFileInLayout("settings.html", layoutFile, map[string]interface{}{"jsfiles": []string{"settings"}})
 
 	// FIXME set active class in navbar
@@ -70,12 +71,14 @@ func main() {
 	addStaticHtmlHandler(moeVocabPath, moeVocabHtml)
 	addStaticHtmlHandler(sentencesPath, sentencesHtml)
 	addStaticHtmlHandler(mcdsPath, mcdsHtml)
+    addStaticHtmlHandler(pinyinifyPath, pinyinifyHtml)
 	addStaticHtmlHandler(settingsPath, settingsHtml)
 
 	http.HandleFunc(vocabLookupPath, vocabLookupHandler)
 	http.HandleFunc(moeVocabLookupPath, moeVocabLookupHandler)
 	http.HandleFunc(sentencesLookupPath, sentencesLookupHandler)
 	http.HandleFunc(mcdsLookupPath, mcdsLookupHandler)
+    http.HandleFunc(pinyinifyLookupPath, pinyinifyLookupHandler)
 
 	// assets file server
 	http.Handle(assetsPath, http.FileServer(http.Dir(".")))
@@ -412,4 +415,40 @@ func mcdsLookupHandler(writer http.ResponseWriter, request *http.Request) {
     
 
 
+}
+
+func pinyinifyLookupHandler(writer http.ResponseWriter, request *http.Request) {
+    text := getLastPathComponent(request)
+    
+    charSet := cedict.DetermineCharSet(text)
+    splitText, err := chinese.SplitChineseTextIntoWords(text, charSet)
+    if err != nil {
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
+		return
+	}
+
+    output := ""
+
+    for _, word := range splitText {
+        records, _ := cedict.FindRecords(word, charSet)
+
+        if len(records) > 0 {
+            output += records[0].Pinyin
+        } else {
+            output += word
+        }
+
+        output += " "
+    }
+
+    j, err := json.Marshal(map[string]interface{}{
+		"error": "nil",
+		"result":   output,
+	})
+	if err != nil {
+		fmt.Fprint(writer, `{"error": "`+err.Error()+`}`)
+		return
+	}
+
+	fmt.Fprint(writer, string(j))
 }

@@ -8,11 +8,13 @@ const (
 	vocabPath      = "/vocab/"
 	sentencesPath  = "/sentences/"
 	mcdsPath       = "/mcds/"
+    pinyinifyPath  = "/pinyinify/"
 
 	moeVocabLookupPath  = "/moe-vocab/lookup/"
 	vocabLookupPath     = "/vocab/lookup/"
 	sentencesLookupPath = "/sentences/lookup/"
 	mcdsLookupPath      = "/mcds/lookup/"
+    pinyinifyLookupPath       = "/pinyinify/lookup/"
 
 	settingsPath  = "/settings/"
 
